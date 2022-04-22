@@ -53,9 +53,9 @@ app.put("/api/user/:userId", (req, res) => {
   //if an user is found, create a user with the new req data to replace the old with the new user in the database
   if (oldUserArray.length > 0) {
     let oldUser = oldUserArray[0];
-    let Id = oldUser.id;
+    let id = oldUser.id;
     let newUser = {
-      Id,
+      id,
       ...req.body,
     };
     //filter to find emails addresses that match the (new) given emailaddress.
