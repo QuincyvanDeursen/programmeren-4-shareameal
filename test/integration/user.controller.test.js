@@ -13,7 +13,7 @@ describe("Users", () => {
       done();
     });
 
-    it("TC-201-1 required field is missing (error should be returned", (done) => {
+    it("TC-201-1 required field is missing. error should be returned.", (done) => {
       chai
         .request(server)
         .post("/api/user")
@@ -21,7 +21,7 @@ describe("Users", () => {
           // firstname is missing
           lastName: "van Deursen",
           emailAdress: "q.vandeursen@student.avans.nl",
-          password: "secret",
+          password: "Password1",
         })
         .end((err, res) => {
           res.should.be.an("object");
@@ -33,7 +33,98 @@ describe("Users", () => {
           done();
         });
     });
+
+    it("TC-201-2 email is not valid. Error should be returned.", (done) => {
+      // email format = quincyvandeursen@gmail.com
+      chai
+        .request(server)
+        .post("/api/user")
+        .send({
+          // email format is incorrect '@' is missing)
+          firstName: "Quincy",
+          lastName: "van Deursen",
+          emailAdress: "quincyvandeursengmail.com",
+          password: "Password1",
+        })
+        .end((err, res) => {
+          res.should.be.an("object");
+          let { status, result } = res.body;
+          status.should.equals(400);
+          result.should.be
+            .a("string")
+            .that.equals("AddUser: emailaddress isn't valid");
+          done();
+        });
+    });
+
+    it("TC-201-3 password is not valid. Error should be returned.", (done) => {
+      chai
+        .request(server)
+        .post("/api/user")
+        .send({
+          // password format is incorrect, number is missing
+          firstName: "Quincy",
+          lastName: "van Deursen",
+          emailAdress: "quincyvandeursen@gmail.com",
+          password: "Password",
+        })
+        .end((err, res) => {
+          res.should.be.an("object");
+          let { status, result } = res.body;
+          status.should.equals(400);
+          result.should.be
+            .a("string")
+            .that.equals(
+              "AddUser: password isn't valid (min 8 chars, 1 uppercase, 1 lowercase, 1 number)"
+            );
+          done();
+        });
+    });
+
+    // it("TC-201-4 Existing user. Error should be returned.", (done) => {
+    //   chai
+    //     .request(server)
+    //     .post("/api/user")
+    //     .send({
+    //       firstName: "Quincy",
+    //       lastName: "van Deursen",
+    //       emailAdress: "quincyvandeursen@gmail.com",
+    //       password: "Password2",
+    //     })
+    //     .end((err, res) => {
+    //       res.should.be.an("object");
+    //       let { status, result } = res.body;
+    //       status.should.equals(400);
+    //       result.should.be
+    //         .a("string")
+    //         .that.equals(
+    //           "AddUser: there is already an account with this emailaddress!"
+    //         );
+    //       done();
+    //     });
+    // });
+
+    it("TC-201-5 succesfully registered user. Should return 201 code", (done) => {
+      chai
+        .request(server)
+        .post("/api/user")
+        .send({
+          // password format is incorrect, number is missing
+          firstName: "Quincy",
+          lastName: "van Deursen",
+          emailAdress: "quincyvandeursen@gmail.com",
+          password: "Password2",
+        })
+        .end((err, res) => {
+          res.should.be.an("object");
+          let { status, result } = res.body;
+          status.should.equals(201);
+          result.should.be.a("string").that.equals("gelukt");
+          done();
+        });
+    });
   });
+
   describe("UC-202 Overzicht van gebruikers", () => {});
 
   describe("UC-203 Gebruikersprofiel opvragen", () => {});

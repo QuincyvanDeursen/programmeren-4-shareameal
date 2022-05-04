@@ -1,12 +1,19 @@
 const assert = require("assert");
 let database = [];
 let id = 0;
+// email without spaces and no multiple '@' signs. Must contain atleast one '@' and one '.'
+const emailRegex = new RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+// password must contain 1 upper and lowercase char, 1 number, and atleast 8 chars.
+const passwordRegex = new RegExp(
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
+);
 
 let controller = {
   //validate the data types of the given user.
   validateUser: (req, res, next) => {
     let user = req.body;
     let { firstName, lastName, emailAdress, password } = user;
+
     try {
       assert(
         typeof firstName === "string",
@@ -21,9 +28,18 @@ let controller = {
         "AddUser: emailaddress must be of type string"
       );
       assert(
+        emailRegex.test(emailAdress) === true,
+        "AddUser: emailaddress isn't valid"
+      );
+      assert(
         typeof password === "string",
         "AddUser: password must be of type string"
       );
+      assert(
+        passwordRegex.test(password) === true,
+        "AddUser: password isn't valid (min 8 chars, 1 uppercase, 1 lowercase, 1 number)"
+      );
+
       next();
     } catch (err) {
       console.log(err);
