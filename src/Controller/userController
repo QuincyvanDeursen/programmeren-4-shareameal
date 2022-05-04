@@ -1,18 +1,69 @@
+const assert = require("assert");
 let database = [];
 const dbconnection = require("../../database/dbconnection");
 let id = 0;
+// email without spaces and no multiple '@' signs. Must contain atleast one '@' and one '.'
+const emailRegex = new RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+// password must contain 1 upper and lowercase char, 1 number, and atleast 8 chars.
+const passwordRegex = new RegExp(
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
+);
 
 let controller = {
-  addUser: (req, res) => {
+  //validate the data types of the given user.
+  validateUser: (req, res, next) => {
+    let user = req.body;
+    let { firstName, lastName, emailAdress, password } = user;
+
+    try {
+      assert(
+        typeof firstName === "string",
+        "AddUser: firstname must be of type string"
+      );
+      assert(
+        typeof lastName === "string",
+        "AddUser: lastname must be of type string"
+      );
+      assert(
+        typeof emailAdress === "string",
+        "AddUser: emailaddress must be of type string"
+      );
+      assert(
+        emailRegex.test(emailAdress) === true,
+        "AddUser: emailaddress isn't valid"
+      );
+      assert(
+        typeof password === "string",
+        "AddUser: password must be of type string"
+      );
+      assert(
+        passwordRegex.test(password) === true,
+        "AddUser: password isn't valid (min 8 chars, 1 uppercase, 1 lowercase, 1 number)"
+      );
+
+      next();
+    } catch (err) {
+      console.log(err);
+      const error = {
+        status: 400,
+        result: err.message,
+      };
+      next(error);
+    }
+  },
+
+  //add an user
+  addUser: (req, res, next) => {
     let user = req.body;
     let email = user.emailAdress;
     let userArray = database.filter((item) => item.emailAdress == email);
     if (userArray.length > 0) {
       console.log(user);
-      res.status(401).json({
+      const error = {
         status: 401,
         result: "Email already in use",
-      });
+      };
+      next(error);
     } else {
       id++;
       user = {
@@ -27,7 +78,8 @@ let controller = {
     }
   },
 
-  updateUser: (req, res) => {
+  //update an user
+  updateUser: (req, res, next) => {
     //get the user for the given ID.
     let oldUserArray = database.filter((item) => item.id == req.params.userId);
     //if an user is found, create a user with the new req data to replace the old with the new user in the database
@@ -47,10 +99,11 @@ let controller = {
       if (emails.length > 0) {
         // if the email matches with one of the other users emails, then an error is given.
         if (req.params.userId != emails[0].id) {
-          res.status(400).json({
+          const error = {
             Status: 400,
             Message: `${newEmail} is already in use`,
-          });
+          };
+          next(error);
           // if the id of the req user is the same as the id of the matching user, then it is allowed to update the email.
         } else {
           database.splice(database.indexOf(oldUser), 1, newUser);
@@ -69,21 +122,25 @@ let controller = {
       }
       //if there is no user found for the given id, then give an error.
     } else {
-      res.status(400).json({
+      const error = {
         Status: 400,
         Message: `user with id ${oldUser.id} can not be found`,
-      });
+      };
+      next(error);
     }
   },
 
-  getProfile: (req, res) => {
-    res.status(401).json({
+  // get the profile of an user
+  getProfile: (req, res, next) => {
+    const error = {
       status: 401,
       result: `End-point not created yet.`,
-    });
+    };
+    next(error);
   },
 
-  findUser: (req, res) => {
+  //find an user by id
+  findUser: (req, res, next) => {
     const userId = req.params.userId;
     console.log(`User met ID ${userId} gezocht`);
     let userArray = database.filter((item) => item.id == userId);
@@ -95,13 +152,15 @@ let controller = {
         result: user,
       });
     } else {
-      res.status(401).json({
+      const error = {
         status: 401,
         result: `User with ID ${userId} not found`,
-      });
+      };
+      next(error);
     }
   },
 
+  //retrieve all users
   getAllUsers: (req, res) => {
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err; // not connected!
@@ -124,7 +183,8 @@ let controller = {
     });
   },
 
-  deleteUser: (req, res) => {
+  //delete all users
+  deleteUser: (req, res, next) => {
     let user = req.params.userId;
     let userArray = database.filter((item) => item.id == user);
     if (userArray.length > 0) {
@@ -136,10 +196,11 @@ let controller = {
         result: `User with id ${user} succesfully deleted`,
       });
     } else {
-      res.status(401).json({
+      const error = {
         status: 401,
         result: `User with ID ${user} not found`,
-      });
+      };
+      next(error);
     }
   },
 };
