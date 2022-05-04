@@ -1,8 +1,9 @@
 const express = require("express");
-const app = express();
-const port = process.env.PORT || 4000;
-app.use(express.json());
 const routerUser = require("./src/routes/user.routes");
+require("dotenv").config();
+const app = express();
+const port = process.env.PORT;
+app.use(express.json());
 
 //this function shows which function is called.
 app.all("*", (req, res, next) => {
