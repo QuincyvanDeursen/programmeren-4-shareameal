@@ -106,8 +106,8 @@ let controller = {
               result: `User ${userReq.firstName} ${userReq.lastName} created`,
             });
           } else {
-            res.status(400).json({
-              status: 400,
+            res.status(401).json({
+              status: 401,
               result: `User can not be created`,
             });
           }
