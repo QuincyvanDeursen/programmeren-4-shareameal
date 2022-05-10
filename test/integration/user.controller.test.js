@@ -2,13 +2,34 @@ const chai = require("chai");
 const chaiHttp = require("chai-http");
 const server = require("../../index");
 
+const INSERT_USER =
+  "INSERT INTO `user` (`firstName`, `lastName`, `street`, `city`, `isActive`, `emailAdress`, `password`, `phoneNumber` ) VALUES" +
+  '("Quincy", "van Deursen", "Lisdodde", "Breda", 1, "Quincyvandeursen@gmail.com", "Secret1!", "061234567");';
+
+const CLEAR_USERS_TABLE = "DELETE IGNORE FROM `user`;";
+const CLEAR_DB = CLEAR_USERS_TABLE;
+
 chai.should();
 chai.use(chaiHttp);
 // all tests below belong to the route api/user/
 describe("Users", () => {
   describe("Testcases of UC-201, create a new user, api/user/ ", () => {
     beforeEach((done) => {
-      done();
+      console.log("beforeEach called");
+      dbconnection.getConnection(function (err, connection) {
+        if (err) throw err; // not connected!
+        connection.query(
+          CLEAR_DB + INSERT_USER,
+          function (error, results, fields) {
+            // When done with the connection, release it.
+            connection.release();
+
+            // Handle error after the release.
+            if (error) throw error;
+            done();
+          }
+        );
+      });
     });
 
     it("TC-201-1 required field is missing. error should be returned.", (done) => {
@@ -17,7 +38,6 @@ describe("Users", () => {
         .post("/api/user")
         .send({
           // firstname is missing
-          firstName: "Quincy",
           lastName: "van Deursenn",
           street: "Lisdodde",
           city: "Breda",
