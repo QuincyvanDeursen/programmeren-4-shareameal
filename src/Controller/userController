@@ -24,15 +24,7 @@ let controller = {
         typeof lastName === "string",
         "AddUser: lastname must be of type string"
       );
-      assert(
-        typeof street === "string",
-        "AddUser: street must be of type string"
-      );
-      assert(typeof city === "string", "AddUser: city must be of type string");
-      assert(
-        typeof isActive === "number",
-        "AddUser: isActive must be of type number"
-      );
+
       assert(
         typeof emailAdress === "string",
         "AddUser: emailaddress must be of type string"
@@ -49,9 +41,26 @@ let controller = {
         passwordRegex.test(password) === true,
         "AddUser: password isn't valid (min 8 chars, 1 uppercase, 1 lowercase, 1 number)"
       );
+
+      next();
+    } catch (err) {
+      console.log(err);
+      const error = {
+        status: 400,
+        message: err.message,
+      };
+      next(error);
+    }
+  },
+
+  validateEmail: (req, res, next) => {
+    let email = req.emailAdress;
+    console.log(email);
+
+    try {
       assert(
-        typeof phoneNumber === "number",
-        "AddUser: phoneNumber must be of type string"
+        typeof firstName === "string",
+        "AddUser: firstname must be of type string"
       );
 
       next();
@@ -106,8 +115,8 @@ let controller = {
               result: `User ${userReq.firstName} ${userReq.lastName} created`,
             });
           } else {
-            res.status(401).json({
-              status: 401,
+            res.status(400).json({
+              status: 400,
               message: `User can not be created`,
             });
           }
