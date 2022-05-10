@@ -42,6 +42,8 @@ jobs:
   deploy:
     needs: integrationtests
     runs-on: ubuntu-latest
+    environment:
+      name: Heroku # naam van mijn environment op GitHub
     steps:
       - uses: actions/checkout@v2
       - uses: akhileshns/heroku-deploy@v3.12.12
