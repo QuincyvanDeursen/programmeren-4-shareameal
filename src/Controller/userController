@@ -25,6 +25,15 @@ let controller = {
         "AddUser: lastname must be of type string"
       );
       assert(
+        typeof street === "string",
+        "AddUser: street must be of type string"
+      );
+      assert(typeof city === "string", "AddUser: city must be of type string");
+      assert(
+        typeof isActive === "number",
+        "AddUser: isActive must be of type number"
+      );
+      assert(
         typeof emailAdress === "string",
         "AddUser: emailaddress must be of type string"
       );
@@ -39,6 +48,10 @@ let controller = {
       assert(
         passwordRegex.test(password) === true,
         "AddUser: password isn't valid (min 8 chars, 1 uppercase, 1 lowercase, 1 number)"
+      );
+      assert(
+        typeof phoneNumber === "number",
+        "AddUser: phoneNumber must be of type string"
       );
 
       next();
@@ -80,16 +93,16 @@ let controller = {
             if (error.errno == 1062) {
               errorMessage = `Creating user failed. There already is an user with the email '${req.body.emailAdress}'.`;
             }
-            return res.status(400).json({
-              status: 400,
+            return res.status(409).json({
+              status: 409,
               error: errorMessage,
             });
           }
 
           // succesfull query handlers
           if (results.affectedRows > 0) {
-            res.status(200).json({
-              status: 200,
+            res.status(201).json({
+              status: 201,
               result: `User ${userReq.firstName} ${userReq.lastName} created`,
             });
           } else {
@@ -201,8 +214,8 @@ let controller = {
               result: results,
             });
           } else {
-            return res.status(400).json({
-              status: 400,
+            return res.status(404).json({
+              status: 404,
               error: `Can not find user with ID ${req.params.userId}`,
             });
           }

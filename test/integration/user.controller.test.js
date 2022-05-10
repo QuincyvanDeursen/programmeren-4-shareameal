@@ -1,7 +1,6 @@
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const server = require("../../index");
-let database = [];
 
 chai.should();
 chai.use(chaiHttp);
@@ -9,7 +8,6 @@ chai.use(chaiHttp);
 describe("Users", () => {
   describe("Testcases of UC-201, create a new user, api/user/ ", () => {
     beforeEach((done) => {
-      database = [];
       done();
     });
 
@@ -19,9 +17,14 @@ describe("Users", () => {
         .post("/api/user")
         .send({
           // firstname is missing
-          lastName: "van Deursen",
+          firstName: "Quincy",
+          lastName: "van Deursenn",
+          street: "Lisdodde",
+          city: "Breda",
+          isActive: 1,
           emailAdress: "q.vandeursen@student.avans.nl",
-          password: "Password1",
+          password: "SecretPas1",
+          phoneNumber: "061234567",
         })
         .end((err, res) => {
           res.should.be.an("object");
