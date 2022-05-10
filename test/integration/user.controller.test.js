@@ -49,9 +49,9 @@ describe("Users", () => {
         })
         .end((err, res) => {
           res.should.be.an("object");
-          let { status, result } = res.body;
+          let { status, message } = res.body;
           status.should.equals(400);
-          result.should.be
+          message.should.be
             .a("string")
             .that.equals("AddUser: firstname must be of type string");
           done();
