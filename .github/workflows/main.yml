@@ -1,9 +1,9 @@
 name: Deploy to Heroku
 
 on:
-  push:
-    branches:
-      - main
+    push:
+        branches:
+            - main
 
 jobs:
     integrationtests:
@@ -39,14 +39,13 @@ jobs:
             - name: npm test
               run: |
                   npm test -- --DB_PASSWORD $MYSQL_ROOT_PASSWORD --DB_USER root --DB_NAME $DB_DATABASE
-  deploy:
-    runs-on: ubuntu-latest
-    environment:
-      name: Heroku # naam van mijn environment op GitHub
-    steps:
-      - uses: actions/checkout@v2
-      - uses: akhileshns/heroku-deploy@v3.12.12
-        with:
+    deploy:
+        needs: integrationtests
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: akhileshns/heroku-deploy@v3.12.12
+              with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: shareameal-2113709
           heroku_email: q.vandeursen@student.avans.nl
