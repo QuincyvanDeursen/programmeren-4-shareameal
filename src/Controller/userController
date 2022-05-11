@@ -158,17 +158,6 @@ let controller = {
 
   //update an user
   updateUser(req, res) {
-    let userReq = req.body;
-    let {
-      firstName,
-      lastName,
-      street,
-      city,
-      isActive,
-      emailAdress,
-      password,
-      phoneNumber,
-    } = userReq;
     dbconnection.getConnection(function (err, connection) {
       //not connected
       if (err) {
@@ -180,7 +169,8 @@ let controller = {
 
       // Use the connection
       connection.query(
-        `UPDATE user SET firstName = '${firstName}', lastName = '${lastName}', street = '${street}', city = '${city}', isActive = ${isActive}, emailAdress = '${emailAdress}', password = '${password}', phoneNumber = '${phoneNumber}' WHERE id = '${req.params.userId}'`,
+        `UPDATE user SET ? WHERE id = ?`,
+        [req.body, req.parans.userId],
         function (error, results, fields) {
           // When done with the connection, release it.
           connection.release();
