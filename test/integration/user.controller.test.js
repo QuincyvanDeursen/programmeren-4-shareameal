@@ -161,6 +161,7 @@ describe("Users", () => {
           let { status, result } = res.body;
           status.should.equals(201);
           result.should.be.a("object").that.contains({
+            id: result.id,
             firstName: "Quincy",
             lastName: "van Deursen",
             street: "Lisdodde",
