@@ -64,12 +64,12 @@ let controller = {
     let {
       firstName,
       lastName,
-      emailAdress,
-      password,
-      city,
       street,
-      phoneNumber,
+      city,
       isActive,
+      password,
+      emailAdress,
+      phoneNumber,
     } = user;
     console.log(user);
     try {
@@ -87,7 +87,7 @@ let controller = {
 
       assert(typeof street === "string", " street must be of type string");
 
-      assert(typeof isActive === "number", "password must be of type number");
+      assert(typeof isActive === "boolean", "isActive must be of type number");
 
       assert(
         typeof phoneNumber === "string",

@@ -6,8 +6,8 @@ const { expect } = require("chai");
 
 const INSERT_USER =
   "INSERT INTO `user` (`id`, `firstName`, `lastName`, `street`, `city`, `isActive`, `password`, `emailAdress`,  `phoneNumber` ) VALUES" +
-  '(1, "Quincy", "van Deursen", "Lisdodde", "Breda", 1,  "Secret1!", "Quincyvandeursen@gmail.com", "061234567"),' +
-  '(2, "Jimmy", "van Deursen", "Lisdodde", "Breda", 1,  "Secret1!", "JimmyvanDeursen@gmail.com", "061234567");';
+  '(1, "Quincy", "van Deursen", "Lisdodde", "Breda", true,  "Secret1!", "Quincyvandeursen@gmail.com", "061234567"),' +
+  '(2, "Jimmy", "van Deursen", "Lisdodde", "Breda", true,  "Secret1!", "JimmyvanDeursen@gmail.com", "061234567");';
 const CLEAR_USERS_TABLE = "DELETE IGNORE FROM `user`;";
 const CLEAR_MEAL_TABLE = "DELETE IGNORE FROM `meal`;";
 const CLEAR_MEAL_PARTICIPANT_TABLE =
@@ -47,7 +47,7 @@ describe("Users", () => {
           lastName: "van Deursen",
           street: "Lisdodde",
           city: "Breda",
-          isActive: 1,
+          isActive: true,
           password: "SecretPas1",
           emailAdress: "q.vandeursen@student.avans.nl",
           phoneNumber: "061234567",
@@ -73,7 +73,7 @@ describe("Users", () => {
           lastName: "van Deursen",
           street: "Lisdodde",
           city: "Breda",
-          isActive: 1,
+          isActive: true,
           password: "SecretPas1",
           emailAdress: "quincyvandeursengmail.com",
           phoneNumber: "061234567",
@@ -124,7 +124,7 @@ describe("Users", () => {
           lastName: "van Deursen",
           street: "Lisdodde",
           city: "Breda",
-          isActive: 1,
+          isActive: true,
           password: "SecretPas6",
           emailAdress: "Quincyvandeursen@gmail.com",
           phoneNumber: "061234567",
@@ -151,7 +151,7 @@ describe("Users", () => {
           lastName: "van Deursen",
           street: "Lisdodde",
           city: "Breda",
-          isActive: 1,
+          isActive: true,
           password: "SecretPas6",
           emailAdress: "Quincyvandeursen2@gmail.com",
           phoneNumber: "061234567",
@@ -293,7 +293,7 @@ describe("Users", () => {
           lastName: "van Deursen",
           street: "Lisdodde",
           city: "Breda",
-          isActive: 1,
+          isActive: true,
           password: "Secret1!",
           emailAdress: "Quincyvandeursen@gmail.com",
           phoneNumber: "061234567",
@@ -319,7 +319,7 @@ describe("Users", () => {
           lastName: "van Deursen",
           street: "Lisdodde",
           city: "Breda",
-          isActive: 1,
+          isActive: true,
           password: "SecretPas1",
           emailAdress: "q.vandeursen@student.avans.nl",
           phoneNumber: "061234567",
@@ -342,7 +342,7 @@ describe("Users", () => {
           lastName: "van Deursen",
           street: "Lisdodde",
           city: "Breda",
-          isActive: 1,
+          isActive: true,
           password: "SecretPas1",
           emailAdress: "Quincyvandeursen@gmail.com",
           phoneNumber: "061234567",
