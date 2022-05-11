@@ -2,9 +2,9 @@ const assert = require("assert");
 const dbconnection = require("../../database/dbconnection");
 
 // password must contain 1 upper and lowercase char, 1 number, and atleast 8 chars.
-const passwordRegex = new RegExp(
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
-);
+// const passwordRegex = new RegExp(
+//   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
+// );
 
 let controller = {
   validateEmail: (req, res, next) => {
@@ -93,10 +93,10 @@ let controller = {
         typeof phoneNumber === "string",
         "phoneNumber must be of type string"
       );
-      assert(
-        passwordRegex.test(password) === true,
-        "password isn't valid (min 8 chars, 1 uppercase, 1 lowercase, 1 number)"
-      );
+      // assert(
+      //   passwordRegex.test(password) === true,
+      //   "password isn't valid (min 8 chars, 1 uppercase, 1 lowercase, 1 number)"
+      // );
 
       next();
     } catch (err) {
@@ -169,8 +169,8 @@ let controller = {
 
       // Use the connection
       connection.query(
-        `UPDATE user SET ? WHERE id = ?`,
-        [req.body, req.parans.userId],
+        "UPDATE user SET ? WHERE id = ?",
+        [req.body, req.params.userId],
         function (error, results, fields) {
           // When done with the connection, release it.
           connection.release();

@@ -87,33 +87,33 @@ describe("Users", () => {
         });
     });
 
-    it("TC-201-3 password is not valid. Error should be returned.", (done) => {
-      chai
-        .request(server)
-        .post("/api/user")
-        .send({
-          // password format is incorrect, number is missing
-          firstName: "Quincy",
-          lastName: "van Deursen",
-          street: "Lisdodde",
-          city: "Breda",
-          isActive: 1,
-          emailAdress: "q.vandeursen@student.avans.nl",
-          password: "SecretPas",
-          phoneNumber: "061234567",
-        })
-        .end((err, res) => {
-          res.should.be.an("object");
-          let { status, message } = res.body;
-          status.should.equals(400);
-          message.should.be
-            .a("string")
-            .that.equals(
-              "password isn't valid (min 8 chars, 1 uppercase, 1 lowercase, 1 number)"
-            );
-          done();
-        });
-    });
+    // it("TC-201-3 password is not valid. Error should be returned.", (done) => {
+    //   chai
+    //     .request(server)
+    //     .post("/api/user")
+    //     .send({
+    //       // password format is incorrect, number is missing
+    //       firstName: "Quincy",
+    //       lastName: "van Deursen",
+    //       street: "Lisdodde",
+    //       city: "Breda",
+    //       isActive: 1,
+    //       emailAdress: "q.vandeursen@student.avans.nl",
+    //       password: "SecretPas",
+    //       phoneNumber: "061234567",
+    //     })
+    //     .end((err, res) => {
+    //       res.should.be.an("object");
+    //       let { status, message } = res.body;
+    //       status.should.equals(400);
+    //       message.should.be
+    //         .a("string")
+    //         .that.equals(
+    //           "password isn't valid (min 8 chars, 1 uppercase, 1 lowercase, 1 number)"
+    //         );
+    //       done();
+    //     });
+    // });
 
     it("TC-201-4 Existing user. Error should be returned.", (done) => {
       chai
