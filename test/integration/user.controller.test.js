@@ -26,14 +26,17 @@ describe("Users", () => {
       console.log("beforeEach called");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
-        connection.query(CLEAR_DB, function (error, results, fields) {
-          // When done with the connection, release it.
-          connection.release();
+        connection.query(
+          CLEAR_DB + INSERT_USER1 + INSERT_USER2,
+          function (error, results, fields) {
+            // When done with the connection, release it.
+            connection.release();
 
-          // Handle error after the release.
-          if (error) throw error;
-          done();
-        });
+            // Handle error after the release.
+            if (error) throw error;
+            done();
+          }
+        );
       });
     });
 
@@ -115,17 +118,6 @@ describe("Users", () => {
     });
 
     it("TC-201-4 Existing user. Error should be returned.", (done) => {
-      dbconnection.getConnection(function (err, connection) {
-        if (err) throw err; // not connected!
-        connection.query(INSERT_USER1, function (error, results, fields) {
-          // When done with the connection, release it.
-          connection.release();
-
-          // Handle error after the release.
-          if (error) throw error;
-        });
-      });
-
       chai
         .request(server)
         .post("/api/user")
@@ -183,21 +175,24 @@ describe("Users", () => {
       console.log("beforeEach called");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
-        connection.query(CLEAR_DB, function (error, results, fields) {
-          // When done with the connection, release it.
-          connection.release();
+        connection.query(
+          CLEAR_DB + INSERT_USER1 + INSERT_USER2,
+          function (error, results, fields) {
+            // When done with the connection, release it.
+            connection.release();
 
-          // Handle error after the release.
-          if (error) throw error;
-          done();
-        });
+            // Handle error after the release.
+            if (error) throw error;
+            done();
+          }
+        );
       });
     });
 
     it("TC-202-1 show zero users.", (done) => {
       chai
         .request(server)
-        .get("/api/user")
+        .get("/api/user?length=0")
         .end((err, res) => {
           res.should.be.an("object");
           let { status, result } = res.body;
@@ -208,23 +203,9 @@ describe("Users", () => {
     });
 
     it("TC-202-2 show two users.", (done) => {
-      dbconnection.getConnection(function (err, connection) {
-        if (err) throw err; // not connected!
-        connection.query(
-          INSERT_USER1 + INSERT_USER2,
-          function (error, results, fields) {
-            // When done with the connection, release it.
-            connection.release();
-
-            // Handle error after the release.
-            if (error) throw error;
-          }
-        );
-      });
-
       chai
         .request(server)
-        .get("/api/user")
+        .get("/api/user?length=2")
         .end((err, res) => {
           res.should.be.an("object");
           let { status, result } = res.body;
@@ -241,14 +222,17 @@ describe("Users", () => {
       console.log("beforeEach called");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
-        connection.query(CLEAR_DB, function (error, results, fields) {
-          // When done with the connection, release it.
-          connection.release();
+        connection.query(
+          CLEAR_DB + INSERT_USER1 + INSERT_USER2,
+          function (error, results, fields) {
+            // When done with the connection, release it.
+            connection.release();
 
-          // Handle error after the release.
-          if (error) throw error;
-          done();
-        });
+            // Handle error after the release.
+            if (error) throw error;
+            done();
+          }
+        );
       });
     });
 
@@ -269,16 +253,6 @@ describe("Users", () => {
     });
 
     it("TC-204-3 Used id does exists.", (done) => {
-      dbconnection.getConnection(function (err, connection) {
-        if (err) throw err; // not connected!
-        connection.query(INSERT_USER1, function (error, results, fields) {
-          // When done with the connection, release it.
-          connection.release();
-
-          // Handle error after the release.
-          if (error) throw error;
-        });
-      });
       chai
         .request(server)
         .get("/api/user/1")
@@ -298,28 +272,21 @@ describe("Users", () => {
       console.log("beforeEach called");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
-        connection.query(CLEAR_DB, function (error, results, fields) {
-          // When done with the connection, release it.
-          connection.release();
+        connection.query(
+          CLEAR_DB + INSERT_USER1 + INSERT_USER2,
+          function (error, results, fields) {
+            // When done with the connection, release it.
+            connection.release();
 
-          // Handle error after the release.
-          if (error) throw error;
-          done();
-        });
+            // Handle error after the release.
+            if (error) throw error;
+            done();
+          }
+        );
       });
     });
 
     it("TC-205-1 required field missing (put).", (done) => {
-      dbconnection.getConnection(function (err, connection) {
-        if (err) throw err; // not connected!
-        connection.query(INSERT_USER1, function (error, results, fields) {
-          // When done with the connection, release it.
-          connection.release();
-
-          // Handle error after the release.
-          if (error) throw error;
-        });
-      });
       chai
         .request(server)
         .put(`/api/user/1`)
@@ -369,16 +336,6 @@ describe("Users", () => {
     });
 
     it("TC-205-6 updating user succesfull.", (done) => {
-      dbconnection.getConnection(function (err, connection) {
-        if (err) throw err; // not connected!
-        connection.query(INSERT_USER1, function (error, results, fields) {
-          // When done with the connection, release it.
-          connection.release();
-
-          // Handle error after the release.
-          if (error) throw error;
-        });
-      });
       chai
         .request(server)
         .put(`/api/user/1`)
@@ -407,31 +364,18 @@ describe("Users", () => {
       console.log("beforeEach called");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
-        connection.query(CLEAR_DB, function (error, results, fields) {
-          // When done with the connection, release it.
-          connection.release();
+        connection.query(
+          CLEAR_DB + INSERT_USER1 + INSERT_USER2,
+          function (error, results, fields) {
+            // When done with the connection, release it.
+            connection.release();
 
-          // Handle error after the release.
-          if (error) throw error;
-          done();
-        });
+            // Handle error after the release.
+            if (error) throw error;
+            done();
+          }
+        );
       });
-    });
-
-    it("TC-206-1 deleting non existing user", (done) => {
-      let id = 99999999;
-      chai
-        .request(server)
-        .delete(`/api/user/${id}`)
-        .end((err, res) => {
-          res.should.be.an("object");
-          let { status, message } = res.body;
-          status.should.equals(400);
-          message.should.be
-            .a("string")
-            .that.equals(`User with id ${id} not found.`);
-          done();
-        });
     });
 
     it("TC-206-1 deleting non existing user", (done) => {
@@ -451,17 +395,6 @@ describe("Users", () => {
     });
 
     it("TC-206-4 deleting user succesfull", (done) => {
-      dbconnection.getConnection(function (err, connection) {
-        if (err) throw err; // not connected!
-        connection.query(INSERT_USER1, function (error, results, fields) {
-          // When done with the connection, release it.
-          connection.release();
-
-          // Handle error after the release.
-          if (error) throw error;
-        });
-      });
-
       chai
         .request(server)
         .delete(`/api/user/1`)

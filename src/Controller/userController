@@ -269,24 +269,32 @@ let controller = {
           message: err,
         });
       }
-      // Use the connection
-      connection.query("SELECT * FROM user", function (error, results, fields) {
-        // When done with the connection, release it.
-        connection.release();
 
-        // Handle error after the release.
-        if (error) {
-          console.log(error);
-          return res.status(400).json({
-            status: 400,
-            message: error.message,
+      let length = 100000;
+      if (req.query.length != null) {
+        length = req.query.length;
+      }
+      // Use the connection
+      connection.query(
+        `SELECT * FROM user LIMIT ${length}`,
+        function (error, results, fields) {
+          // When done with the connection, release it.
+          connection.release();
+
+          // Handle error after the release.
+          if (error) {
+            console.log(error);
+            return res.status(400).json({
+              status: 400,
+              message: error.message,
+            });
+          }
+          res.status(200).json({
+            status: 200,
+            result: results,
           });
         }
-        res.status(200).json({
-          status: 200,
-          result: results,
-        });
-      });
+      );
     });
   },
 
