@@ -4,11 +4,9 @@ const server = require("../../index");
 const dbconnection = require("../../database/dbconnection");
 const { expect } = require("chai");
 
-const INSERT_USER1 =
+const INSERT_USER =
   "INSERT INTO `user` (`id`, `firstName`, `lastName`, `street`, `city`, `isActive`, `emailAdress`, `password`, `phoneNumber` ) VALUES" +
-  '(1, "Quincy", "van Deursen", "Lisdodde", "Breda", 1, "Quincyvandeursen@gmail.com", "Secret1!", "061234567");';
-const INSERT_USER2 =
-  "INSERT INTO `user` (`id`, `firstName`, `lastName`, `street`, `city`, `isActive`, `emailAdress`, `password`, `phoneNumber` ) VALUES" +
+  '(1, "Quincy", "van Deursen", "Lisdodde", "Breda", 1, "Quincyvandeursen@gmail.com", "Secret1!", "061234567"),' +
   '(2, "Jimmy", "van Deursen", "Lisdodde", "Breda", 1, "JimmyvanDeursen@gmail.com", "Secret1!", "061234567");';
 const CLEAR_USERS_TABLE = "DELETE IGNORE FROM `user`;";
 const CLEAR_MEAL_TABLE = "DELETE IGNORE FROM `meal`;";
@@ -27,7 +25,7 @@ describe("Users", () => {
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
         connection.query(
-          CLEAR_DB + INSERT_USER1 + INSERT_USER2,
+          CLEAR_DB + INSERT_USER,
           function (error, results, fields) {
             // When done with the connection, release it.
             connection.release();
@@ -176,7 +174,7 @@ describe("Users", () => {
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
         connection.query(
-          CLEAR_DB + INSERT_USER1 + INSERT_USER2,
+          CLEAR_DB + INSERT_USER,
           function (error, results, fields) {
             // When done with the connection, release it.
             connection.release();
@@ -223,7 +221,7 @@ describe("Users", () => {
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
         connection.query(
-          CLEAR_DB + INSERT_USER1 + INSERT_USER2,
+          CLEAR_DB + INSERT_USER,
           function (error, results, fields) {
             // When done with the connection, release it.
             connection.release();
@@ -273,7 +271,7 @@ describe("Users", () => {
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
         connection.query(
-          CLEAR_DB + INSERT_USER1 + INSERT_USER2,
+          CLEAR_DB + INSERT_USER,
           function (error, results, fields) {
             // When done with the connection, release it.
             connection.release();
@@ -365,7 +363,7 @@ describe("Users", () => {
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
         connection.query(
-          CLEAR_DB + INSERT_USER1 + INSERT_USER2,
+          CLEAR_DB + INSERT_USER,
           function (error, results, fields) {
             // When done with the connection, release it.
             connection.release();
