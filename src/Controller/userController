@@ -126,7 +126,7 @@ let controller = {
       }
       // Use the connection
       connection.query(
-        `INSERT INTO user (firstName, lastName, street, city, isActive, emailAdress, password, phoneNumber) VALUES (?)`,
+        `INSERT INTO user (firstName, lastName, street, city, isActive, password, emailAdress, phoneNumber) VALUES (?)`,
         [values],
         function (error, results, fields) {
           connection.release();
