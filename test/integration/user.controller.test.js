@@ -26,17 +26,14 @@ describe("Users", () => {
       console.log("beforeEach called");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
-        connection.query(
-          CLEAR_DB + INSERT_USER1,
-          function (error, results, fields) {
-            // When done with the connection, release it.
-            connection.release();
+        connection.query(CLEAR_DB, function (error, results, fields) {
+          // When done with the connection, release it.
+          connection.release();
 
-            // Handle error after the release.
-            if (error) throw error;
-            done();
-          }
-        );
+          // Handle error after the release.
+          if (error) throw error;
+          done();
+        });
       });
     });
 
@@ -118,6 +115,17 @@ describe("Users", () => {
     });
 
     it("TC-201-4 Existing user. Error should be returned.", (done) => {
+      dbconnection.getConnection(function (err, connection) {
+        if (err) throw err; // not connected!
+        connection.query(INSERT_USER1, function (error, results, fields) {
+          // When done with the connection, release it.
+          connection.release();
+
+          // Handle error after the release.
+          if (error) throw error;
+        });
+      });
+
       chai
         .request(server)
         .post("/api/user")
