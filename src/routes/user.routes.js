@@ -12,10 +12,20 @@ router.get("/", (req, res) => {
 });
 
 //this function executes a post call to create an user. The given email must be unique. The user is added to the database (array). UC-201.
-router.post("/api/user", userController.validateUser, userController.addUser);
+router.post(
+  "/api/user",
+  userController.validateEmail,
+  userController.validateUser,
+  userController.addUser
+);
 
 //function to update an existing user. Email cant be duplicated. UC-205
-router.put("/api/user/:userId", userController.updateUser);
+router.put(
+  "/api/user/:userId",
+  userController.validateEmail,
+  userController.validateUser,
+  userController.updateUser
+);
 
 //function to get the profile. UC-203
 router.get("/api/user/profile", userController.getProfile);

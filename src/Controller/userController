@@ -1,66 +1,101 @@
 const assert = require("assert");
 const dbconnection = require("../../database/dbconnection");
 
-//regex
-// email without spaces and no multiple '@' signs. Must contain atleast one '@' and one '.'
-const emailRegex = new RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
 // password must contain 1 upper and lowercase char, 1 number, and atleast 8 chars.
 const passwordRegex = new RegExp(
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
 );
 
 let controller = {
-  //validate the data types of the given user.
-  validateUser: (req, res, next) => {
+  validateEmail: (req, res, next) => {
+    //email regex
+    const emailRegex = new RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
     let user = req.body;
-    let { firstName, lastName, emailAdress, password } = user;
-    console.log(user);
+    let emailAdress = user.emailAdress;
     try {
-      assert(
-        typeof firstName === "string",
-        "AddUser: firstname must be of type string"
-      );
-      assert(
-        typeof lastName === "string",
-        "AddUser: lastname must be of type string"
-      );
-
-      assert(
-        typeof emailAdress === "string",
-        "AddUser: emailaddress must be of type string"
-      );
-      assert(
-        emailRegex.test(emailAdress) === true,
-        "AddUser: emailaddress isn't valid"
-      );
-      assert(
-        typeof password === "string",
-        "AddUser: password must be of type string"
-      );
-      assert(
-        passwordRegex.test(password) === true,
-        "AddUser: password isn't valid (min 8 chars, 1 uppercase, 1 lowercase, 1 number)"
-      );
-
-      next();
+      assert(emailRegex.test(emailAdress) === true, "Emailaddress isn't valid");
     } catch (err) {
       console.log(err);
-      const error = {
+      error = {
         status: 400,
         message: err.message,
       };
       next(error);
     }
+
+    dbconnection.getConnection(function (err, connection) {
+      //not connected
+      if (err) {
+        return res.status(400).json({
+          Status: 400,
+          message: err,
+        });
+      }
+
+      connection.query(
+        `SELECT * FROM user WHERE emailAdress = '${req.body.emailAdress}'`,
+        function (error, results, fields) {
+          // When done with the connection, release it.
+          connection.release();
+          // handle error after release.
+          if (error) {
+            console.log(error);
+            return res.status(400).json({
+              status: 400,
+              message: error.message,
+            });
+          }
+          if (results.length == 0 || results[0].id == req.params.userId) {
+            next();
+          } else {
+            return res.status(409).json({
+              status: 409,
+              message: `Creating user failed. There already is an user with the email '${req.body.emailAdress}'.`,
+            });
+          }
+        }
+      );
+    });
   },
 
-  validateEmail: (req, res, next) => {
-    let email = req.emailAdress;
-    console.log(email);
-
+  //validate the data types of the given user.
+  validateUser: (req, res, next) => {
+    let user = req.body;
+    let {
+      firstName,
+      lastName,
+      emailAdress,
+      password,
+      city,
+      street,
+      phoneNumber,
+      isActive,
+    } = user;
+    console.log(user);
     try {
+      assert(typeof firstName === "string", "firstname must be of type string");
+      assert(typeof lastName === "string", "lastname must be of type string");
+
       assert(
-        typeof firstName === "string",
-        "AddUser: firstname must be of type string"
+        typeof emailAdress === "string",
+        "emailaddress must be of type string"
+      );
+
+      assert(typeof password === "string", "password must be of type string");
+
+      assert(typeof city === "string", "city must be of type string");
+
+      assert(typeof street === "string", " street must be of type string");
+
+      assert(typeof isActive === "number", "password must be of type number");
+
+      assert(
+        typeof phoneNumber === "string",
+        "phoneNumber must be of type string"
+      );
+      assert(
+        passwordRegex.test(password) === true,
+        "password isn't valid (min 8 chars, 1 uppercase, 1 lowercase, 1 number)"
       );
 
       next();
@@ -98,13 +133,9 @@ let controller = {
           // Handle error after the release.
           if (error) {
             console.log(error);
-            let errorMessage = error.message;
-            if (error.errno == 1062) {
-              errorMessage = `Creating user failed. There already is an user with the email '${req.body.emailAdress}'.`;
-            }
-            return res.status(409).json({
-              status: 409,
-              message: errorMessage,
+            return res.status(400).json({
+              status: 400,
+              message: error.message,
             });
           }
 
@@ -126,7 +157,7 @@ let controller = {
   },
 
   //update an user
-  updateUser: (req, res) => {
+  updateUser(req, res) {
     let userReq = req.body;
     let {
       firstName,
@@ -141,7 +172,7 @@ let controller = {
     dbconnection.getConnection(function (err, connection) {
       //not connected
       if (err) {
-        throw res.status(400).json({
+        return res.status(400).json({
           Status: 400,
           Error: err,
         });
@@ -149,26 +180,21 @@ let controller = {
 
       // Use the connection
       connection.query(
-        `UPDATE user SET firstName = '${firstName}', lastName = '${lastName}', street = '${street}', city = '${city}', isActive = ${isActive}, emailAdress = '${emailAdress}', password = '${password}', phoneNumber = '${phoneNumber}' WHERE id = ${req.params.userId}`,
+        `UPDATE user SET firstName = '${firstName}', lastName = '${lastName}', street = '${street}', city = '${city}', isActive = ${isActive}, emailAdress = '${emailAdress}', password = '${password}', phoneNumber = '${phoneNumber}' WHERE id = '${req.params.userId}'`,
         function (error, results, fields) {
           // When done with the connection, release it.
           connection.release();
           // Handle error after the release.
           if (error) {
             console.log(error);
-            let errorMessage = error.message;
-            if (error.errno == 1062) {
-              errorMessage = `Update failed. There already is an user with the email '${emailAdress}'.`;
-            }
             return res.status(400).json({
               status: 400,
-              message: errorMessage,
+              error: error.message,
             });
           }
 
           // succesfull query handlers
           if (results.affectedRows > 0) {
-            console.log(`User with id ${req.params.userId} updated.`);
             res.status(200).json({
               status: 200,
               result: `User with id ${req.params.userId} updated.`,
