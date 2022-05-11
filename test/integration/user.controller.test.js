@@ -160,9 +160,16 @@ describe("Users", () => {
           res.should.be.an("object");
           let { status, result } = res.body;
           status.should.equals(201);
-          result.should.be
-            .a("string")
-            .that.equals(`User Quincy van Deursen created`);
+          result.should.be.a("object").that.contains({
+            firstName: "Quincy",
+            lastName: "van Deursen",
+            street: "Lisdodde",
+            city: "Breda",
+            isActive: true,
+            password: "SecretPas6",
+            emailAdress: "Quincyvandeursen2@gmail.com",
+            phoneNumber: "061234567",
+          });
           done();
         });
     });
