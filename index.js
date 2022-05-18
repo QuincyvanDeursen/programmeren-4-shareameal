@@ -1,5 +1,6 @@
 const express = require("express");
 const routerUser = require("./src/routes/user.routes");
+const routerAuth = require("./src/routes/authentication.routes");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT;
@@ -13,6 +14,7 @@ app.all("*", (req, res, next) => {
 });
 
 app.use(routerUser);
+app.use(routerAuth);
 
 //function to give an error when an end-point isnt found
 app.all("*", (req, res) => {
@@ -23,7 +25,11 @@ app.all("*", (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  res.status(err.status).json(err);
+  console.log("Error: " + err.toString());
+  res.status(400).json({
+    status: 400,
+    message: err.message,
+  });
 });
 
 app.listen(port, () => {

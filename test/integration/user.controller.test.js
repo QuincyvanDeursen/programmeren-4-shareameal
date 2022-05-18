@@ -2,12 +2,15 @@ const chai = require("chai");
 const chaiHttp = require("chai-http");
 const server = require("../../index");
 const dbconnection = require("../../database/dbconnection");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+const { jwtSecretKey, logger } = require("../../src/config/config");
 const { expect } = require("chai");
 
 const INSERT_USER =
   "INSERT INTO `user` (`id`, `firstName`, `lastName`, `street`, `city`, `isActive`, `password`, `emailAdress`,  `phoneNumber` ) VALUES" +
-  '(1, "Quincy", "van Deursen", "Lisdodde", "Breda", true,  "Secret1!", "Quincyvandeursen@gmail.com", "061234567"),' +
-  '(2, "Jimmy", "van Deursen", "Lisdodde", "Breda", true,  "Secret1!", "JimmyvanDeursen@gmail.com", "061234567");';
+  '(1, "Quincy", "van Deursen", "Lisdodde", "Breda", true,  "Secret1!", "Quincyvandeursen@gmail.com", "0612345678"),' +
+  '(2, "Jimmy", "van Deursen", "Lisdodde", "Breda", false,  "Secret1!", "JimmyvanDeursen@gmail.com", "0612345678");';
 const CLEAR_USERS_TABLE = "DELETE IGNORE FROM `user`;";
 const CLEAR_MEAL_TABLE = "DELETE IGNORE FROM `meal`;";
 const CLEAR_MEAL_PARTICIPANT_TABLE =
@@ -50,7 +53,7 @@ describe("Users", () => {
           isActive: true,
           password: "SecretPas1",
           emailAdress: "q.vandeursen@student.avans.nl",
-          phoneNumber: "061234567",
+          phoneNumber: "0612345678",
         })
         .end((err, res) => {
           res.should.be.an("object");
@@ -70,13 +73,14 @@ describe("Users", () => {
         .post("/api/user")
         .send({
           // email format is incorrect '@' is missing)
+          firstName: "Quincy",
           lastName: "van Deursen",
           street: "Lisdodde",
           city: "Breda",
           isActive: true,
           password: "SecretPas1",
           emailAdress: "quincyvandeursengmail.com",
-          phoneNumber: "061234567",
+          phoneNumber: "0612345678",
         })
         .end((err, res) => {
           res.should.be.an("object");
@@ -87,33 +91,33 @@ describe("Users", () => {
         });
     });
 
-    // it("TC-201-3 password is not valid. Error should be returned.", (done) => {
-    //   chai
-    //     .request(server)
-    //     .post("/api/user")
-    //     .send({
-    //       // password format is incorrect, number is missing
-    //       firstName: "Quincy",
-    //       lastName: "van Deursen",
-    //       street: "Lisdodde",
-    //       city: "Breda",
-    //       isActive: 1,
-    //       emailAdress: "q.vandeursen@student.avans.nl",
-    //       password: "SecretPas",
-    //       phoneNumber: "061234567",
-    //     })
-    //     .end((err, res) => {
-    //       res.should.be.an("object");
-    //       let { status, message } = res.body;
-    //       status.should.equals(400);
-    //       message.should.be
-    //         .a("string")
-    //         .that.equals(
-    //           "password isn't valid (min 8 chars, 1 uppercase, 1 lowercase, 1 number)"
-    //         );
-    //       done();
-    //     });
-    // });
+    it("TC-201-3 password is not valid. Error should be returned.", (done) => {
+      chai
+        .request(server)
+        .post("/api/user")
+        .send({
+          // password format is incorrect, number is missing
+          firstName: "Quincy",
+          lastName: "van Deursen",
+          street: "Lisdodde",
+          city: "Breda",
+          isActive: true,
+          emailAdress: "q.vandeursen@student.avans.nl",
+          password: "SecretPas",
+          phoneNumber: "0612345678",
+        })
+        .end((err, res) => {
+          res.should.be.an("object");
+          let { status, message } = res.body;
+          status.should.equals(400);
+          message.should.be
+            .a("string")
+            .that.equals(
+              "Password isn't valid (must contain 1 uppercase letter, 1 number, and be atleast 8 characters long."
+            );
+          done();
+        });
+    });
 
     it("TC-201-4 Existing user. Error should be returned.", (done) => {
       chai
@@ -127,7 +131,7 @@ describe("Users", () => {
           isActive: true,
           password: "SecretPas6",
           emailAdress: "Quincyvandeursen@gmail.com",
-          phoneNumber: "061234567",
+          phoneNumber: "0612345678",
         })
         .end((err, res) => {
           res.should.be.an("object");
@@ -154,7 +158,7 @@ describe("Users", () => {
           isActive: true,
           password: "SecretPas6",
           emailAdress: "Quincyvandeursen2@gmail.com",
-          phoneNumber: "061234567",
+          phoneNumber: "0612345678",
         })
         .end((err, res) => {
           res.should.be.an("object");
@@ -169,7 +173,7 @@ describe("Users", () => {
             isActive: true,
             password: "SecretPas6",
             emailAdress: "Quincyvandeursen2@gmail.com",
-            phoneNumber: "061234567",
+            phoneNumber: "0612345678",
           });
           done();
         });
@@ -218,6 +222,62 @@ describe("Users", () => {
           status.should.equals(200);
           result.should.be.an("array");
           expect(result).to.have.lengthOf(2);
+          done();
+        });
+    });
+
+    it("TC-202-3 Show users with non existing name.", (done) => {
+      chai
+        .request(server)
+        .get("/api/user?firstName=qqqqqqqqqqqq")
+        .end((err, res) => {
+          res.should.be.an("object");
+          let { status, result } = res.body;
+          status.should.equals(200);
+          result.should.be.an("array");
+          expect(result).to.have.lengthOf(0);
+          done();
+        });
+    });
+
+    it("TC-202-4 Show users with isActive = false.", (done) => {
+      chai
+        .request(server)
+        .get("/api/user?isActive=false")
+        .end((err, res) => {
+          res.should.be.an("object");
+          let { status, result } = res.body;
+          status.should.equals(200);
+          result.should.be.an("array");
+          expect(result).to.have.lengthOf(1);
+          done();
+        });
+    });
+
+    it("TC-202-5 Show users with isActive = true.", (done) => {
+      chai
+        .request(server)
+        .get("/api/user?isActive=false")
+        .end((err, res) => {
+          res.should.be.an("object");
+          let { status, result } = res.body;
+          status.should.equals(200);
+          result.should.be.an("array");
+          expect(result).to.have.lengthOf(1);
+          done();
+        });
+    });
+
+    it("TC-202-6 Show users with  existing name.", (done) => {
+      chai
+        .request(server)
+        .get("/api/user?firstName=Quincy")
+        .end((err, res) => {
+          res.should.be.an("object");
+          let { status, result } = res.body;
+          status.should.equals(200);
+          result.should.be.an("array");
+          expect(result).to.have.lengthOf(1);
           done();
         });
     });
@@ -292,19 +352,19 @@ describe("Users", () => {
       });
     });
 
-    it("TC-205-1 required field missing (put).", (done) => {
+    it("TC-205-1 required field email missing (put).", (done) => {
       chai
         .request(server)
         .put(`/api/user/1`)
+        .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
         .send({
-          //first name missing
+          firstName: "Quincy",
           lastName: "van Deursen",
           street: "Lisdodde",
           city: "Breda",
           isActive: true,
-          password: "Secret1!",
-          emailAdress: "Quincyvandeursen@gmail.com",
-          phoneNumber: "061234567",
+          password: "Secret12",
+          phoneNumber: "0612345678",
         })
         .end((err, res) => {
           res.should.be.an("object");
@@ -312,7 +372,31 @@ describe("Users", () => {
           status.should.equals(400);
           message.should.be
             .a("string")
-            .that.equals("firstname must be of type string");
+            .that.equals("emailaddress must be of type string");
+          done();
+        });
+    });
+
+    it("TC-205-3 unvalid phoneNumber.", (done) => {
+      chai
+        .request(server)
+        .put(`/api/user/2`)
+        .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
+        .send({
+          firstName: "Quincy",
+          lastName: "van Deursen",
+          street: "Lisdodde",
+          city: "Breda",
+          isActive: true,
+          password: "SecretPas1",
+          emailAdress: "q.vandeursen@student.avans.nl",
+          phoneNumber: "Unvalid",
+        })
+        .end((err, res) => {
+          res.should.be.an("object");
+          let { status, message } = res.body;
+          status.should.equals(400);
+          message.should.be.a("string").that.equals("Phonenumber isn't valid.");
           done();
         });
     });
@@ -322,6 +406,7 @@ describe("Users", () => {
       chai
         .request(server)
         .put(`/api/user/${id}`)
+        .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
         .send({
           firstName: "Quincy",
           lastName: "van Deursen",
@@ -330,13 +415,15 @@ describe("Users", () => {
           isActive: true,
           password: "SecretPas1",
           emailAdress: "q.vandeursen@student.avans.nl",
-          phoneNumber: "061234567",
+          phoneNumber: "0612345678",
         })
         .end((err, res) => {
           res.should.be.an("object");
           let { status, message } = res.body;
           status.should.equals(400);
-          message.should.be.a("string").that.equals("Updating user failed.");
+          message.should.be
+            .a("string")
+            .that.equals("Can't find user with ID: 99999999");
           done();
         });
     });
@@ -345,6 +432,7 @@ describe("Users", () => {
       chai
         .request(server)
         .put(`/api/user/1`)
+        .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
         .send({
           firstName: "QuincyWithUpdatedName",
           lastName: "van Deursen",
@@ -353,7 +441,7 @@ describe("Users", () => {
           isActive: true,
           password: "SecretPas1",
           emailAdress: "Quincyvandeursen@gmail.com",
-          phoneNumber: "061234567",
+          phoneNumber: "0612345678",
         })
         .end((err, res) => {
           res.should.be.an("object");

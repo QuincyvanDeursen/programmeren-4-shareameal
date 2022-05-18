@@ -1,12 +1,48 @@
 const assert = require("assert");
 const dbconnection = require("../../database/dbconnection");
 
-// password must contain 1 upper and lowercase char, 1 number, and atleast 8 chars.
-// const passwordRegex = new RegExp(
-//   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
-// );
-
 let controller = {
+  validatePhoneNumber: (req, res, next) => {
+    // password must contain 1 upper and lowercase char, 1 number, and atleast 8 chars.
+    const phoneNumber = new RegExp(
+      /^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/
+    );
+    try {
+      assert(
+        phoneNumber.test(req.body.phoneNumber) === true,
+        "Phonenumber isn't valid."
+      );
+      next();
+    } catch (err) {
+      console.log("validatePhoneNumber: " + err);
+      error = {
+        status: 400,
+        message: err.message,
+      };
+      next(error);
+    }
+  },
+
+  validatePassword: (req, res, next) => {
+    // password must contain 1 upper and lowercase char, 1 number, and atleast 8 chars.
+    const passwordRegex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/);
+    try {
+      assert(
+        passwordRegex.test(req.body.password) === true,
+        "Password isn't valid (must contain 1 uppercase letter, 1 number, and be atleast 8 characters long."
+      );
+      console.log("validatePassword: Called");
+      next();
+    } catch (err) {
+      console.log("ValidatePassword: " + err);
+      error = {
+        status: 400,
+        message: err.message,
+      };
+      next(error);
+    }
+  },
+
   validateEmail: (req, res, next) => {
     //email regex
     const emailRegex = new RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
@@ -26,10 +62,7 @@ let controller = {
     dbconnection.getConnection(function (err, connection) {
       //not connected
       if (err) {
-        return res.status(400).json({
-          Status: 400,
-          message: err,
-        });
+        next(err);
       }
 
       connection.query(
@@ -39,11 +72,7 @@ let controller = {
           connection.release();
           // handle error after release.
           if (error) {
-            console.log(error);
-            return res.status(400).json({
-              status: 400,
-              message: error.message,
-            });
+            next(error);
           }
           if (results.length == 0 || results[0].id == req.params.userId) {
             next();
@@ -81,36 +110,27 @@ let controller = {
         "emailaddress must be of type string"
       );
 
-      assert(typeof password === "string", "password must be of type string");
-
       assert(typeof city === "string", "city must be of type string");
 
       assert(typeof street === "string", " street must be of type string");
 
-      assert(typeof isActive === "boolean", "isActive must be of type number");
+      assert(typeof isActive === "boolean", "isActive must be of type boolean");
+
+      assert(typeof password === "string", "Password must be of type string");
 
       assert(
         typeof phoneNumber === "string",
         "phoneNumber must be of type string"
       );
-      // assert(
-      //   passwordRegex.test(password) === true,
-      //   "password isn't valid (min 8 chars, 1 uppercase, 1 lowercase, 1 number)"
-      // );
 
       next();
     } catch (err) {
-      console.log(err);
-      const error = {
-        status: 400,
-        message: err.message,
-      };
-      next(error);
+      next(err);
     }
   },
 
   //add an user
-  addUser: (req, res) => {
+  addUser: (req, res, next) => {
     let userReq = req.body;
     let values = Object.keys(userReq).map(function (key) {
       return userReq[key];
@@ -119,10 +139,7 @@ let controller = {
     dbconnection.getConnection(function (err, connection) {
       //not connected
       if (err) {
-        throw res.status(400).json({
-          Status: 400,
-          message: err,
-        });
+        next(err);
       }
       // Use the connection
       connection.query(
@@ -132,11 +149,7 @@ let controller = {
           connection.release();
           // Handle error after the release.
           if (error) {
-            console.log(error);
-            return res.status(400).json({
-              status: 400,
-              message: error.message,
-            });
+            next(error);
           }
 
           // succesfull query handlers
@@ -158,43 +171,56 @@ let controller = {
   },
 
   //update an user
-  updateUser(req, res) {
+  updateUser(req, res, next) {
     dbconnection.getConnection(function (err, connection) {
       //not connected
       if (err) {
-        return res.status(400).json({
-          Status: 400,
-          Error: err,
-        });
+        next(err);
       }
-
-      // Use the connection
       connection.query(
-        "UPDATE user SET ? WHERE id = ?",
-        [req.body, req.params.userId],
+        "SELECT * FROM user WHERE id = ?",
+        [req.params.userId],
         function (error, results, fields) {
           // When done with the connection, release it.
           connection.release();
           // Handle error after the release.
           if (error) {
-            console.log(error);
-            return res.status(400).json({
-              status: 400,
-              error: error.message,
-            });
+            next(error);
           }
 
           // succesfull query handlers
-          if (results.affectedRows > 0) {
-            res.status(200).json({
-              status: 200,
-              result: `User with id ${req.params.userId} updated.`,
+          if (results.affectedRows > 0 && results[0].id == req.userId) {
+            return res.status(401).json({
+              status: 401,
+              result: `User not authorized`,
             });
           } else {
-            res.status(400).json({
-              status: 400,
-              message: `Updating user failed.`,
-            });
+            // Use the connection
+            connection.query(
+              "UPDATE user SET ? WHERE id = ?",
+              [req.body, req.params.userId],
+              function (error, results, fields) {
+                // When done with the connection, release it.
+                connection.release();
+                // Handle error after the release.
+                if (error) {
+                  next(error);
+                }
+
+                // succesfull query handlers
+                if (results.affectedRows > 0) {
+                  res.status(200).json({
+                    status: 200,
+                    result: `User with id ${req.params.userId} updated.`,
+                  });
+                } else {
+                  res.status(400).json({
+                    status: 400,
+                    message: `Can't find user with ID: ${req.params.userId}`,
+                  });
+                }
+              }
+            );
           }
         }
       );
@@ -211,14 +237,11 @@ let controller = {
   },
 
   //find an user by id
-  findUser: (req, res) => {
+  findUser: (req, res, next) => {
     dbconnection.getConnection(function (err, connection) {
       //not connected
       if (err) {
-        throw res.status(400).json({
-          Status: 400,
-          message: err,
-        });
+        next(err);
       }
 
       connection.query(
@@ -228,11 +251,7 @@ let controller = {
           connection.release();
           // handle error after release.
           if (error) {
-            console.log(error);
-            return res.status(400).json({
-              status: 400,
-              message: error.message,
-            });
+            next(error);
           }
           if (results.length > 0) {
             return res.status(200).json({
@@ -251,53 +270,54 @@ let controller = {
   },
 
   //Retrieve all users
-  getAllUsers: (req, res) => {
+  getAllUsers: (req, res, next) => {
+    let query = `SELECT * FROM user`;
+    const { length, isActive, firstName } = req.query;
+    console.log(
+      `GetAllUsers params: length = ${length}, isActive = ${isActive}, firstName = ${firstName}`
+    );
+    if (isActive && firstName) {
+      query += ` WHERE firstName = '${firstName}' AND isActive = ${isActive}`;
+    } else if (isActive) {
+      query += ` WHERE isActive = ${isActive}`;
+    } else if (firstName) {
+      query += ` WHERE firstName = '${firstName}'`;
+    }
+    if (length) {
+      query += ` LIMIT ${length}`;
+    }
+
+    console.log("getAllUsers Query:" + query);
+
     dbconnection.getConnection(function (err, connection) {
       //not connected
       if (err) {
-        throw res.status(400).json({
-          Status: 400,
-          message: err,
-        });
+        next(err);
       }
 
-      let length = 100000;
-      if (req.query.length != null) {
-        length = req.query.length;
-      }
       // Use the connection
-      connection.query(
-        `SELECT * FROM user LIMIT ${length}`,
-        function (error, results, fields) {
-          // When done with the connection, release it.
-          connection.release();
+      connection.query(query, function (error, results, fields) {
+        // When done with the connection, release it.
+        connection.release();
 
-          // Handle error after the release.
-          if (error) {
-            console.log(error);
-            return res.status(400).json({
-              status: 400,
-              message: error.message,
-            });
-          }
-          res.status(200).json({
-            status: 200,
-            result: results,
-          });
+        // Handle error after the release.
+        if (error) {
+          next(error);
         }
-      );
+        res.status(200).json({
+          status: 200,
+          result: results,
+        });
+      });
     });
   },
 
   //Delete user
-  deleteUser: (req, res) => {
+  deleteUser: (req, res, next) => {
     dbconnection.getConnection(function (err, connection) {
       //not connected
       if (err) {
-        throw res.status(400).json({
-          Status: 400,
-          message: err,
-        });
+        next(err);
       }
 
       // Use the connection
@@ -309,11 +329,7 @@ let controller = {
 
           // Handle error after the release.
           if (error) {
-            console.log(error);
-            return res.status(400).json({
-              status: 400,
-              message: error.message,
-            });
+            next(error);
           }
 
           if (results.affectedRows > 0) {

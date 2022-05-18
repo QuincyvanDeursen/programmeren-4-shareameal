@@ -1,5 +1,5 @@
 const express = require("express");
-const { updateUser } = require("../Controller/userController");
+const authController = require("../Controller/authController");
 const router = express.Router();
 const userController = require("../Controller/userController");
 
@@ -14,16 +14,20 @@ router.get("/", (req, res) => {
 //this function executes a post call to create an user. The given email must be unique. The user is added to the database (array). UC-201.
 router.post(
   "/api/user",
-  userController.validateEmail,
   userController.validateUser,
+  userController.validatePassword,
+  userController.validateEmail,
   userController.addUser
 );
 
 //function to update an existing user. Email cant be duplicated. UC-205
 router.put(
   "/api/user/:userId",
-  userController.validateEmail,
+  authController.validateToken,
   userController.validateUser,
+  userController.validatePassword,
+  userController.validateEmail,
+  userController.validatePhoneNumber,
   userController.updateUser
 );
 
