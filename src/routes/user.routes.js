@@ -32,7 +32,11 @@ router.put(
 );
 
 //function to get the profile. UC-203
-router.get("/api/user/profile", userController.getProfile);
+router.get(
+  "/api/user/profile",
+  authController.validateToken,
+  userController.getProfile
+);
 
 //function to find an user by id. UC-204
 router.get("/api/user/:userId", userController.findUser);

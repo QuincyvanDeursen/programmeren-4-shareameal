@@ -283,6 +283,67 @@ describe("Users", () => {
     });
   });
 
+  describe("UC-203 get Profile", () => {
+    beforeEach((done) => {
+      console.log("beforeEach called");
+      dbconnection.getConnection(function (err, connection) {
+        if (err) throw err; // not connected!
+        connection.query(
+          CLEAR_DB + INSERT_USER,
+          function (error, results, fields) {
+            // When done with the connection, release it.
+            connection.release();
+
+            // Handle error after the release.
+            if (error) throw error;
+            done();
+          }
+        );
+      });
+    });
+
+    it("TC-203-1 unvalid token", (done) => {
+      chai
+        .request(server)
+        .get(`/api/user/profile`)
+        .set(
+          "authorization",
+          "Bearer " + jwt.sign({ userId: 2 }, jwtSecretKey) + "AN_UNVALID_PART"
+        )
+        .end((err, res) => {
+          res.should.be.an("object");
+          let { status, message } = res.body;
+          status.should.equals(401);
+          message.should.be.a("string").that.equals(`Not authorized`);
+          done();
+        });
+    });
+
+    it("TC-203-2 valid token", (done) => {
+      chai
+        .request(server)
+        .get(`/api/user/profile`)
+        .set("authorization", "Bearer " + jwt.sign({ userId: 1 }, jwtSecretKey))
+        .end((err, res) => {
+          res.should.be.an("object");
+          let { status, result } = res.body;
+          status.should.equals(200);
+          result.should.be.a("object").that.contains({
+            id: result.id,
+            firstName: "Quincy",
+            lastName: "van Deursen",
+            street: "Lisdodde",
+            city: "Breda",
+            isActive: 1,
+            password: "Secret1!",
+            emailAdress: "Quincyvandeursen@gmail.com",
+            phoneNumber: "0612345678",
+          });
+          done();
+        });
+    });
+  });
+
   describe("UC-204 Details van gebruiker", () => {
     beforeEach((done) => {
       console.log("beforeEach called");
@@ -356,7 +417,7 @@ describe("Users", () => {
       chai
         .request(server)
         .put(`/api/user/1`)
-        .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
+        .set("authorization", "Bearer " + jwt.sign({ userId: 2 }, jwtSecretKey))
         .send({
           firstName: "Quincy",
           lastName: "van Deursen",
@@ -381,7 +442,7 @@ describe("Users", () => {
       chai
         .request(server)
         .put(`/api/user/2`)
-        .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
+        .set("authorization", "Bearer " + jwt.sign({ userId: 2 }, jwtSecretKey))
         .send({
           firstName: "Quincy",
           lastName: "van Deursen",
@@ -406,7 +467,7 @@ describe("Users", () => {
       chai
         .request(server)
         .put(`/api/user/${id}`)
-        .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
+        .set("authorization", "Bearer " + jwt.sign({ userId: 2 }, jwtSecretKey))
         .send({
           firstName: "Quincy",
           lastName: "van Deursen",
@@ -431,23 +492,23 @@ describe("Users", () => {
     it("TC-205-6 updating user succesfull.", (done) => {
       chai
         .request(server)
-        .put(`/api/user/1`)
-        .set("authorization", "Bearer " + jwt.sign({ id: 1 }, jwtSecretKey))
+        .put(`/api/user/2`)
+        .set("authorization", "Bearer " + jwt.sign({ userId: 2 }, jwtSecretKey))
         .send({
-          firstName: "QuincyWithUpdatedName",
+          firstName: "JimmyWithUpdatedName",
           lastName: "van Deursen",
           street: "Lisdodde",
           city: "Breda",
           isActive: true,
           password: "SecretPas1",
-          emailAdress: "Quincyvandeursen@gmail.com",
+          emailAdress: "JimmyvanDeursen@gmail.com",
           phoneNumber: "0612345678",
         })
         .end((err, res) => {
           res.should.be.an("object");
           let { status, result } = res.body;
           status.should.equals(200);
-          result.should.be.a("string").that.equals("User with id 1 updated.");
+          result.should.be.a("string").that.equals("User with id 2 updated.");
           done();
         });
     });

@@ -132,11 +132,17 @@ module.exports = {
     logger.info("validateToken called");
     // logger.trace(req.headers)
     // The headers should contain the authorization-field with value 'Bearer [token]'
+    if (req) {
+      console.log("req is aanwezig");
+    } else {
+      console.log("req is leeg");
+    }
     const authHeader = req.headers.authorization;
     if (!authHeader) {
       logger.warn("Authorization header missing!");
       res.status(401).json({
-        error: "Authorization header missing!",
+        status: 401,
+        message: "Authorization header missing!",
         datetime: new Date().toISOString(),
       });
     } else {
@@ -147,7 +153,8 @@ module.exports = {
         if (err) {
           logger.warn("Not authorized");
           res.status(401).json({
-            error: "Not authorized",
+            status: 401,
+            message: "Not authorized",
             datetime: new Date().toISOString(),
           });
         }

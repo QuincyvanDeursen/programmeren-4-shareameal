@@ -189,7 +189,8 @@ let controller = {
           }
 
           // succesfull query handlers
-          if (results.affectedRows > 0 && results[0].id == req.userId) {
+          console.log(req.userId);
+          if (results.length > 0 && results[0].id != req.userId) {
             return res.status(401).json({
               status: 401,
               result: `User not authorized`,
@@ -229,11 +230,34 @@ let controller = {
 
   // get the profile of an user
   getProfile: (req, res, next) => {
-    const error = {
-      status: 401,
-      message: `End-point not created yet.`,
-    };
-    next(error);
+    dbconnection.getConnection(function (err, connection) {
+      //not connected
+      if (err) {
+        next(err);
+      }
+      connection.query(
+        `SELECT * FROM user WHERE id = ${req.userId}`,
+        function (error, results, fields) {
+          // When done with the connection, release it.
+          connection.release();
+          // handle error after release.
+          if (error) {
+            next(error);
+          }
+          if (results.length > 0) {
+            return res.status(200).json({
+              status: 200,
+              result: results[0],
+            });
+          } else {
+            return res.status(401).json({
+              status: 401,
+              message: `Can not retrieve profile. Unknown error.`,
+            });
+          }
+        }
+      );
+    });
   },
 
   //find an user by id
