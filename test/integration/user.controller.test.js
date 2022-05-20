@@ -203,6 +203,7 @@ describe("Users", () => {
       chai
         .request(server)
         .get("/api/user?length=0")
+        .set("authorization", "Bearer " + jwt.sign({ userId: 1 }, jwtSecretKey))
         .end((err, res) => {
           res.should.be.an("object");
           let { status, result } = res.body;
@@ -216,6 +217,7 @@ describe("Users", () => {
       chai
         .request(server)
         .get("/api/user?length=2")
+        .set("authorization", "Bearer " + jwt.sign({ userId: 1 }, jwtSecretKey))
         .end((err, res) => {
           res.should.be.an("object");
           let { status, result } = res.body;
@@ -230,6 +232,7 @@ describe("Users", () => {
       chai
         .request(server)
         .get("/api/user?firstName=qqqqqqqqqqqq")
+        .set("authorization", "Bearer " + jwt.sign({ userId: 1 }, jwtSecretKey))
         .end((err, res) => {
           res.should.be.an("object");
           let { status, result } = res.body;
@@ -244,6 +247,7 @@ describe("Users", () => {
       chai
         .request(server)
         .get("/api/user?isActive=false")
+        .set("authorization", "Bearer " + jwt.sign({ userId: 1 }, jwtSecretKey))
         .end((err, res) => {
           res.should.be.an("object");
           let { status, result } = res.body;
@@ -258,6 +262,7 @@ describe("Users", () => {
       chai
         .request(server)
         .get("/api/user?isActive=false")
+        .set("authorization", "Bearer " + jwt.sign({ userId: 1 }, jwtSecretKey))
         .end((err, res) => {
           res.should.be.an("object");
           let { status, result } = res.body;
@@ -272,6 +277,7 @@ describe("Users", () => {
       chai
         .request(server)
         .get("/api/user?firstName=Quincy")
+        .set("authorization", "Bearer " + jwt.sign({ userId: 1 }, jwtSecretKey))
         .end((err, res) => {
           res.should.be.an("object");
           let { status, result } = res.body;
@@ -363,11 +369,30 @@ describe("Users", () => {
       });
     });
 
+    it("TC-204-1 Unvalid token.", (done) => {
+      let id = 1;
+      chai
+        .request(server)
+        .get(`/api/user/${id}`)
+        .set(
+          "authorization",
+          "Bearer " + jwt.sign({ userId: 1 }, jwtSecretKey + "AN_UNVALID_PART")
+        )
+        .end((err, res) => {
+          res.should.be.an("object");
+          let { status, message } = res.body;
+          status.should.equals(401);
+          message.should.be.a("string").that.equals(`Not authorized`);
+          done();
+        });
+    });
+
     it("TC-204-2 Used id doesnt exist.", (done) => {
       let id = 999999999;
       chai
         .request(server)
         .get(`/api/user/${id}`)
+        .set("authorization", "Bearer " + jwt.sign({ userId: 1 }, jwtSecretKey))
         .end((err, res) => {
           res.should.be.an("object");
           let { status, message } = res.body;
@@ -383,6 +408,7 @@ describe("Users", () => {
       chai
         .request(server)
         .get("/api/user/1")
+        .set("authorization", "Bearer " + jwt.sign({ userId: 1 }, jwtSecretKey))
         .end((err, res) => {
           res.should.be.an("object");
           let { status, result } = res.body;
@@ -484,7 +510,35 @@ describe("Users", () => {
           status.should.equals(400);
           message.should.be
             .a("string")
-            .that.equals("Can't find user with ID: 99999999");
+            .that.equals(
+              "User doesn't exists, or not authorized to delete the user."
+            );
+          done();
+        });
+    });
+
+    it("TC-205-5 not logged in.", (done) => {
+      let id = 1;
+      chai
+        .request(server)
+        .put(`/api/user/${id}`)
+        .send({
+          firstName: "Quincy",
+          lastName: "van Deursen",
+          street: "Lisdodde",
+          city: "Breda",
+          isActive: true,
+          password: "SecretPas1",
+          emailAdress: "q.vandeursen@student.avans.nl",
+          phoneNumber: "0612345678",
+        })
+        .end((err, res) => {
+          res.should.be.an("object");
+          let { status, message } = res.body;
+          status.should.equals(401);
+          message.should.be
+            .a("string")
+            .that.equals("Authorization header missing!");
           done();
         });
     });
@@ -538,13 +592,43 @@ describe("Users", () => {
       chai
         .request(server)
         .delete(`/api/user/${id}`)
+        .set("authorization", "Bearer " + jwt.sign({ userId: 1 }, jwtSecretKey))
         .end((err, res) => {
           res.should.be.an("object");
           let { status, message } = res.body;
           status.should.equals(400);
+          message.should.be.a("string").that.equals(`User doesn't exists.`);
+          done();
+        });
+    });
+
+    it("TC-206-2 not logged in.", (done) => {
+      chai
+        .request(server)
+        .delete(`/api/user/1`)
+        .end((err, res) => {
+          res.should.be.an("object");
+          let { status, message } = res.body;
+          status.should.equals(401);
           message.should.be
             .a("string")
-            .that.equals(`User with id ${id} not found.`);
+            .that.equals(`Authorization header missing!`);
+          done();
+        });
+    });
+
+    it("TC-206-3 user is not the owner.", (done) => {
+      chai
+        .request(server)
+        .delete(`/api/user/2`)
+        .set("authorization", "Bearer " + jwt.sign({ userId: 1 }, jwtSecretKey))
+        .end((err, res) => {
+          res.should.be.an("object");
+          let { status, message } = res.body;
+          status.should.equals(403);
+          message.should.be
+            .a("string")
+            .that.equals(`Not authorized to delete the user.`);
           done();
         });
     });
@@ -553,6 +637,7 @@ describe("Users", () => {
       chai
         .request(server)
         .delete(`/api/user/1`)
+        .set("authorization", "Bearer " + jwt.sign({ userId: 1 }, jwtSecretKey))
         .end((err, res) => {
           res.should.be.an("object");
           let { status, result } = res.body;

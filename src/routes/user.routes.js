@@ -39,12 +39,24 @@ router.get(
 );
 
 //function to find an user by id. UC-204
-router.get("/api/user/:userId", userController.findUser);
+router.get(
+  "/api/user/:userId",
+  authController.validateToken,
+  userController.findUser
+);
 
 //function to get all users in the database (array). UC-202
-router.get("/api/user", userController.getAllUsers);
+router.get(
+  "/api/user",
+  authController.validateToken,
+  userController.getAllUsers
+);
 
 //function to delete a specific user.
-router.delete("/api/user/:userId", userController.deleteUser);
+router.delete(
+  "/api/user/:userId",
+  authController.validateToken,
+  userController.deleteUser
+);
 
 module.exports = router;

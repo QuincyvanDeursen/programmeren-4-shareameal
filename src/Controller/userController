@@ -129,7 +129,7 @@ let controller = {
     }
   },
 
-  //add an user
+  //POST: Add an user
   addUser: (req, res, next) => {
     let userReq = req.body;
     let values = Object.keys(userReq).map(function (key) {
@@ -137,11 +137,11 @@ let controller = {
     });
 
     dbconnection.getConnection(function (err, connection) {
-      //not connected
+      //if not connected
       if (err) {
         next(err);
       }
-      // Use the connection
+      //Use Connection
       connection.query(
         `INSERT INTO user (firstName, lastName, street, city, isActive, password, emailAdress, phoneNumber) VALUES (?)`,
         [values],
@@ -177,54 +177,40 @@ let controller = {
       if (err) {
         next(err);
       }
-      connection.query(
-        "SELECT * FROM user WHERE id = ?",
-        [req.params.userId],
-        function (error, results, fields) {
-          // When done with the connection, release it.
-          connection.release();
-          // Handle error after the release.
-          if (error) {
-            next(error);
-          }
+      if (req.params.userId != req.userId) {
+        return res.status(401).json({
+          status: 400,
+          message: `User doesn't exists, or not authorized to delete the user.`,
+        });
+      } else {
+        console.log("Passed check");
+        // Use the connection
+        connection.query(
+          "UPDATE user SET ? WHERE id = ?",
+          [req.body, req.params.userId],
+          function (error, results, fields) {
+            // When done with the connection, release it.
+            connection.release();
+            // Handle error after the release.
+            if (error) {
+              next(error);
+            }
 
-          // succesfull query handlers
-          console.log(req.userId);
-          if (results.length > 0 && results[0].id != req.userId) {
-            return res.status(401).json({
-              status: 401,
-              result: `User not authorized`,
-            });
-          } else {
-            // Use the connection
-            connection.query(
-              "UPDATE user SET ? WHERE id = ?",
-              [req.body, req.params.userId],
-              function (error, results, fields) {
-                // When done with the connection, release it.
-                connection.release();
-                // Handle error after the release.
-                if (error) {
-                  next(error);
-                }
-
-                // succesfull query handlers
-                if (results.affectedRows > 0) {
-                  res.status(200).json({
-                    status: 200,
-                    result: `User with id ${req.params.userId} updated.`,
-                  });
-                } else {
-                  res.status(400).json({
-                    status: 400,
-                    message: `Can't find user with ID: ${req.params.userId}`,
-                  });
-                }
-              }
-            );
+            // succesfull query handlers
+            if (results.affectedRows > 0) {
+              res.status(200).json({
+                status: 200,
+                result: `User with id ${req.params.userId} updated.`,
+              });
+            } else {
+              res.status(400).json({
+                status: 400,
+                message: `Can't find user with ID: ${req.params.userId}`,
+              });
+            }
           }
-        }
-      );
+        );
+      }
     });
   },
 
@@ -244,6 +230,7 @@ let controller = {
           if (error) {
             next(error);
           }
+
           if (results.length > 0) {
             return res.status(200).json({
               status: 200,
@@ -267,7 +254,6 @@ let controller = {
       if (err) {
         next(err);
       }
-
       connection.query(
         `SELECT * FROM user WHERE id = ${req.params.userId}`,
         function (error, results, fields) {
@@ -342,6 +328,20 @@ let controller = {
       //not connected
       if (err) {
         next(err);
+      }
+
+      //Check if the person is deleting his own account, if not return error 401.
+      if (req.params.userId != req.userId) {
+        if (req.params.userId > 1000000 || !Number(req.params.userId)) {
+          return res.status(400).json({
+            status: 400,
+            message: `User doesn't exists.`,
+          });
+        }
+        return res.status(403).json({
+          status: 403,
+          message: `Not authorized to delete the user.`,
+        });
       }
 
       // Use the connection
