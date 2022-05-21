@@ -388,7 +388,7 @@ describe("Users", () => {
     });
 
     it("TC-204-2 Used id doesnt exist.", (done) => {
-      let id = 999999999;
+      let id = 0;
       chai
         .request(server)
         .get(`/api/user/${id}`)
@@ -399,7 +399,7 @@ describe("Users", () => {
           status.should.equals(404);
           message.should.be
             .a("string")
-            .that.equals(`Can not find user with ID ${id}`);
+            .that.equals(`Can not find user with ID ${0}`);
           done();
         });
     });
@@ -489,7 +489,7 @@ describe("Users", () => {
     });
 
     it("TC-205-4 Used id doesnt exist.", (done) => {
-      let id = 99999999;
+      let id = 0;
       chai
         .request(server)
         .put(`/api/user/${id}`)
@@ -511,7 +511,7 @@ describe("Users", () => {
           message.should.be
             .a("string")
             .that.equals(
-              "User doesn't exists, or not authorized to delete the user."
+              "User doesn't exists, or not authorized to update the user."
             );
           done();
         });
@@ -562,7 +562,17 @@ describe("Users", () => {
           res.should.be.an("object");
           let { status, result } = res.body;
           status.should.equals(200);
-          result.should.be.a("string").that.equals("User with id 2 updated.");
+          result.should.be.a("object").that.contains({
+            id: result.id,
+            firstName: "JimmyWithUpdatedName",
+            lastName: "van Deursen",
+            street: "Lisdodde",
+            city: "Breda",
+            isActive: true,
+            password: "SecretPas1",
+            emailAdress: "JimmyvanDeursen@gmail.com",
+            phoneNumber: "0612345678",
+          });
           done();
         });
     });

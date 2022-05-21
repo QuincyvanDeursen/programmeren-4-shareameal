@@ -178,12 +178,11 @@ let controller = {
         next(err);
       }
       if (req.params.userId != req.userId) {
-        return res.status(401).json({
+        return res.status(400).json({
           status: 400,
-          message: `User doesn't exists, or not authorized to delete the user.`,
+          message: `User doesn't exists, or not authorized to update the user.`,
         });
       } else {
-        console.log("Passed check");
         // Use the connection
         connection.query(
           "UPDATE user SET ? WHERE id = ?",
@@ -198,9 +197,10 @@ let controller = {
 
             // succesfull query handlers
             if (results.affectedRows > 0) {
+              userToUpdate = req.body;
               res.status(200).json({
                 status: 200,
-                result: `User with id ${req.params.userId} updated.`,
+                result: { id: req.params.userId, ...userToUpdate },
               });
             } else {
               res.status(400).json({

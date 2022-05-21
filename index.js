@@ -1,6 +1,7 @@
 const express = require("express");
 const routerUser = require("./src/routes/user.routes");
 const routerAuth = require("./src/routes/authentication.routes");
+const routerMeal = require("./src/routes/meal.routes");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT;
@@ -15,6 +16,7 @@ app.all("*", (req, res, next) => {
 
 app.use(routerUser);
 app.use(routerAuth);
+app.use(routerMeal);
 
 //function to give an error when an end-point isnt found
 app.all("*", (req, res) => {

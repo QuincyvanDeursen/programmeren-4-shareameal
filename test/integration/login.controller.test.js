@@ -2,10 +2,7 @@ const chai = require("chai");
 const chaiHttp = require("chai-http");
 const server = require("../../index");
 const dbconnection = require("../../database/dbconnection");
-const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const { jwtSecretKey, logger } = require("../../src/config/config");
-const { expect } = require("chai");
 
 const INSERT_USER =
   "INSERT INTO `user` (`id`, `firstName`, `lastName`, `street`, `city`, `isActive`, `password`, `emailAdress`,  `phoneNumber` ) VALUES" +
