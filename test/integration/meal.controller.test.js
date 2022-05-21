@@ -13,8 +13,8 @@ const INSERT_USER =
 
 const INSERT_MEAL =
   "INSERT INTO meal (id, name, description, isActive, isVega, isVegan, isToTakeHome, dateTime, imageUrl, allergenes, maxAmountOfParticipants, price, cookId) VALUES" +
-  '(1, "meal1", "meal1 description", true, true, true, true, "2022-05-21T07:11:46.701Z", "image_url_meal1", "gluten,noten,lactose", 6, 5.55, 1),' +
-  '(2, "meal2", "meal2 description", true, true, true, true, "2022-05-21T07:11:46.701Z", "image_url_meal2", "gluten,noten,lactose", 6, 5.55, 2);';
+  '(1, "meal1", "meal1 description", true, true, true, true, "2022-05-21 07:11:46", "image_url_meal1", "gluten,noten,lactose", 6, 5.55, 1),' +
+  '(2, "meal2", "meal2 description", true, true, true, true, "2022-05-21 07:11:46", "image_url_meal2", "gluten,noten,lactose", 6, 5.55, 2);';
 
 const CLEAR_USERS_TABLE = "DELETE IGNORE FROM `user`;";
 const CLEAR_MEAL_TABLE = "DELETE IGNORE FROM `meal`;";
