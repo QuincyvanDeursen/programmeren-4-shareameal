@@ -490,8 +490,8 @@ describe("meals", () => {
     it("TC-305-5 meal does not exist", (done) => {
       chai
         .request(server)
-        .delete("/api/meal/1")
-        .set("authorization", "Bearer " + jwt.sign({ userId: 1 }, jwtSecretKey))
+        .delete("/api/meal/2")
+        .set("authorization", "Bearer " + jwt.sign({ userId: 2 }, jwtSecretKey))
         .end((err, res) => {
           res.should.be.an("object");
           let { status, result } = res.body;
