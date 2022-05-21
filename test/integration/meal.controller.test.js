@@ -119,7 +119,7 @@ describe("meals", () => {
           isVega: true,
           isVegan: true,
           isToTakeHome: true,
-          dateTime: "2022-05-21T07:11:46.701Z",
+          dateTime: "2022-05-21 07:11:46",
           imageUrl:
             "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
           allergenes: ["gluten", "lactose"],
@@ -139,7 +139,7 @@ describe("meals", () => {
             isVega: true,
             isVegan: true,
             isToTakeHome: true,
-            dateTime: "2022-05-21T07:11:46.701Z",
+            dateTime: "2022-05-21 07:11:46",
             imageUrl:
               "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
             allergenes: result.allergenes,
