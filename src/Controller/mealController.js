@@ -1,5 +1,4 @@
 const assert = require("assert");
-const { expect } = require("chai");
 const dbconnection = require("../../database/dbconnection");
 
 let controller = {
@@ -35,11 +34,6 @@ let controller = {
       assert(typeof dateTime === "string", "dateTime must be of type string");
 
       assert(typeof imageUrl === "string", " imageUrl must be of type string");
-
-      assert(
-        expect(allergenes).to.be.an("array"),
-        "allergenes must be of type array"
-      );
 
       assert(
         typeof maxAmountOfParticipants === "number",
