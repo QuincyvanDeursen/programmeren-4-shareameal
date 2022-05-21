@@ -498,7 +498,7 @@ describe("meals", () => {
           status.should.equals(200);
           result.should.be
             .a("string")
-            .that.equals("Meal with id 1 succesfully deleted.");
+            .that.equals("Meal with id 2 succesfully deleted.");
           done();
         });
     });
