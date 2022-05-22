@@ -127,7 +127,7 @@ describe("Login", () => {
           result.should.be.a("object").that.contains({
             id: result.id,
             emailAdress: "Quincyvandeursen@gmail.com",
-            isActive: 1,
+            isActive: result.isActive,
             password: "Secret1997",
             firstName: "Quincy",
             lastName: "van Deursen",
