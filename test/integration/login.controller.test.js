@@ -127,8 +127,13 @@ describe("Login", () => {
           result.should.be.a("object").that.contains({
             id: result.id,
             emailAdress: "Quincyvandeursen@gmail.com",
+            isActive: 1,
+            password: "Secret1997",
             firstName: "Quincy",
             lastName: "van Deursen",
+            city: "Breda",
+            street: "Lisdodde",
+
             token: result.token,
           });
           done();

@@ -284,6 +284,17 @@ describe("Users", () => {
           status.should.equals(200);
           result.should.be.an("array");
           expect(result).to.have.lengthOf(1);
+          result[0].should.be.an("object").that.contains({
+            id: 1,
+            firstName: "Quincy",
+            lastName: "van Deursen",
+            street: "Lisdodde",
+            city: "Breda",
+            isActive: 1,
+            password: "Secret1!",
+            emailAdress: "Quincyvandeursen@gmail.com",
+            phoneNumber: "0612345678",
+          });
           done();
         });
     });
@@ -415,6 +426,17 @@ describe("Users", () => {
           status.should.equals(200);
           result.should.be.an("array");
           expect(result).to.have.lengthOf(1);
+          result[0].should.be.an("object").that.contains({
+            id: 1,
+            firstName: "Quincy",
+            lastName: "van Deursen",
+            street: "Lisdodde",
+            city: "Breda",
+            isActive: 1,
+            password: "Secret1!",
+            emailAdress: "Quincyvandeursen@gmail.com",
+            phoneNumber: "0612345678",
+          });
           done();
         });
     });

@@ -56,7 +56,7 @@ module.exports = {
       if (connection) {
         // 1. Kijk of deze useraccount bestaat.
         connection.query(
-          "SELECT `id`, `emailAdress`, `password`, `firstName`, `lastName` FROM `user` WHERE `emailAdress` = ?",
+          "SELECT `id`, `emailAdress`, `isActive`, `password`, `firstName`, `lastName`, `city`, `street` FROM `user` WHERE `emailAdress` = ?",
           [req.body.emailAdress],
           (err, rows, fields) => {
             connection.release();
@@ -83,7 +83,7 @@ module.exports = {
                 const payload = {
                   userId: userinfo.id,
                 };
-
+                const user = rows[0];
                 jwt.sign(
                   payload,
                   jwtSecretKey,
@@ -92,7 +92,7 @@ module.exports = {
                     logger.debug("User logged in, sending: ", userinfo);
                     res.status(200).json({
                       status: 200,
-                      result: { ...userinfo, token },
+                      result: { ...user, token },
                     });
                   }
                 );

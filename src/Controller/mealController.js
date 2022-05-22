@@ -13,7 +13,6 @@ let controller = {
       isToTakeHome,
       dateTime,
       imageUrl,
-      allergenes,
       maxAmountOfParticipants,
       price,
     } = meal;

@@ -4,6 +4,7 @@ const dbconnection = require("../../database/dbconnection");
 let controller = {
   validatePhoneNumber: (req, res, next) => {
     // password must contain 1 upper and lowercase char, 1 number, and atleast 8 chars.
+    console.log(req.body);
     const phoneNumber = new RegExp(
       /^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/
     );
