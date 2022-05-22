@@ -1,10 +1,11 @@
 const assert = require("assert");
 const dbconnection = require("../../database/dbconnection");
+const logger = require("../../src/config/config").logger;
 
 let controller = {
   validatePhoneNumber: (req, res, next) => {
+    logger.debug("userController: validatePhoneNumber called.");
     // password must contain 1 upper and lowercase char, 1 number, and atleast 8 chars.
-    console.log(req.body);
     const phoneNumber = new RegExp(
       /^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/
     );
@@ -13,9 +14,10 @@ let controller = {
         phoneNumber.test(req.body.phoneNumber) === true,
         "Phonenumber isn't valid."
       );
+      logger.debug("userController: phoneNumber is valid.");
       next();
     } catch (err) {
-      console.log("validatePhoneNumber: " + err);
+      logger.debug("userController: phoneNumber is not valid.");
       error = {
         status: 400,
         message: err.message,
@@ -25,6 +27,7 @@ let controller = {
   },
 
   validatePassword: (req, res, next) => {
+    logger.debug("userController: validatePassword called");
     // password must contain 1 upper and lowercase char, 1 number, and atleast 8 chars.
     const passwordRegex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/);
     try {
@@ -32,10 +35,10 @@ let controller = {
         passwordRegex.test(req.body.password) === true,
         "Password isn't valid (must contain 1 uppercase letter, 1 number, and be atleast 8 characters long."
       );
-      console.log("validatePassword: Called");
+      logger.debug("userController: password is valid.");
       next();
     } catch (err) {
-      console.log("ValidatePassword: " + err);
+      logger.debug("userController: password is not valid.");
       error = {
         status: 400,
         message: err.message,
@@ -45,14 +48,16 @@ let controller = {
   },
 
   validateEmail: (req, res, next) => {
+    logger.debug("userController: validateEmail called");
     //email regex
     const emailRegex = new RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
     let user = req.body;
     let emailAdress = user.emailAdress;
     try {
       assert(emailRegex.test(emailAdress) === true, "Emailaddress isn't valid");
+      logger.debug("userController: emailAdress is valid");
     } catch (err) {
-      console.log(err);
+      logger.debug("userController: emailAdress is not valid");
       error = {
         status: 400,
         message: err.message,
@@ -90,6 +95,7 @@ let controller = {
 
   //validate the data types of the given user.
   validateUser: (req, res, next) => {
+    logger.debug("userController: validateUser called");
     let user = req.body;
     let {
       firstName,
@@ -101,7 +107,6 @@ let controller = {
       emailAdress,
       phoneNumber,
     } = user;
-    console.log(user);
     try {
       assert(typeof firstName === "string", "firstname must be of type string");
       assert(typeof lastName === "string", "lastname must be of type string");
@@ -123,15 +128,17 @@ let controller = {
         typeof phoneNumber === "string",
         "phoneNumber must be of type string"
       );
-
+      logger.debug("userController: user is valid");
       next();
     } catch (err) {
+      logger.debug("userController: user is not valid");
       next(err);
     }
   },
 
   //POST: Add an user
   addUser: (req, res, next) => {
+    logger.debug("userController: addUser is called");
     let userReq = req.body;
     let values = Object.keys(userReq).map(function (key) {
       return userReq[key];
@@ -173,6 +180,7 @@ let controller = {
 
   //update an user
   updateUser(req, res, next) {
+    logger.debug("userController: updateUser is called");
     dbconnection.getConnection(function (err, connection) {
       //not connected
       if (err) {
@@ -217,6 +225,7 @@ let controller = {
 
   // get the profile of an user
   getProfile: (req, res, next) => {
+    logger.debug("userController: getProfile is called");
     dbconnection.getConnection(function (err, connection) {
       //not connected
       if (err) {
@@ -250,6 +259,7 @@ let controller = {
 
   //find an user by id
   findUser: (req, res, next) => {
+    logger.debug("userController: findUser is called");
     dbconnection.getConnection(function (err, connection) {
       //not connected
       if (err) {
@@ -282,11 +292,13 @@ let controller = {
 
   //Retrieve all users
   getAllUsers: (req, res, next) => {
+    logger.debug("userController: getAllUsers is called");
     let query = `SELECT * FROM user`;
     const { length, isActive, firstName } = req.query;
-    console.log(
-      `GetAllUsers params: length = ${length}, isActive = ${isActive}, firstName = ${firstName}`
+    logger.debug(
+      `userController: GetAllUsers params --> length = ${length}, isActive = ${isActive}, firstName = ${firstName}`
     );
+
     if (isActive && firstName) {
       query += ` WHERE firstName = '${firstName}' AND isActive = ${isActive}`;
     } else if (isActive) {
@@ -298,7 +310,7 @@ let controller = {
       query += ` LIMIT ${length}`;
     }
 
-    console.log("getAllUsers Query:" + query);
+    logger.debug("userController: getAllUsers --> Query: " + query);
 
     dbconnection.getConnection(function (err, connection) {
       //not connected
@@ -325,6 +337,7 @@ let controller = {
 
   //Delete user
   deleteUser: (req, res, next) => {
+    logger.debug("userController: deleteUser is called");
     dbconnection.getConnection(function (err, connection) {
       //not connected
       if (err) {

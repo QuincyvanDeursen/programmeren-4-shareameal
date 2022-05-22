@@ -1,8 +1,10 @@
 const assert = require("assert");
 const dbconnection = require("../../database/dbconnection");
+const logger = require("../../src/config/config").logger;
 
 let controller = {
   validateMeal: (req, res, next) => {
+    logger.debug("mealController: validateMeal called.");
     let meal = req.body;
     let {
       name,
@@ -40,14 +42,16 @@ let controller = {
       );
 
       assert(typeof price === "number", "phoneNumber must be of type number");
-
+      logger.debug("mealController: meal is valid.");
       next();
     } catch (err) {
+      logger.debug("mealController: meal is not valid.");
       next(err);
     }
   },
 
   getAllMeals: (req, res, next) => {
+    logger.debug("mealController: getAllMeals called.");
     let query = `SELECT * FROM meal`;
     dbconnection.getConnection(function (err, connection) {
       //not connected
@@ -74,6 +78,7 @@ let controller = {
 
   //POST: Add an user
   addMeal: (req, res, next) => {
+    logger.debug("mealController: addMeal called.");
     //format allergenes JSON to the right string for the query
     const allergenes = req.body.allergenes;
     let allergenesString = "";
@@ -87,7 +92,8 @@ let controller = {
     let cookId = req.userId;
     let mealObject = { ...mealReq, cookId };
     mealObject.allergenes = allergenesString;
-    console.log(mealObject);
+    logger.debug("mealController: addMeal -->  Altered mealReq.");
+    logger.debug(mealObject);
     let values = Object.keys(mealObject).map(function (key) {
       return mealObject[key];
     });
@@ -124,6 +130,7 @@ let controller = {
   },
 
   deleteMeal: (req, res, next) => {
+    logger.debug("mealController: deleteMeal called.");
     let query = `DELETE FROM meal WHERE id = (?)`;
     dbconnection.getConnection(function (err, connection) {
       //not connected
@@ -181,6 +188,7 @@ let controller = {
   },
 
   findMeal: (req, res, next) => {
+    logger.debug("mealController: findMeal called.");
     let query = `SELECT * FROM meal WHERE id = (?)`;
     dbconnection.getConnection(function (err, connection) {
       //not connected
@@ -218,6 +226,7 @@ let controller = {
   },
 
   updateMeal: (req, res, next) => {
+    logger.debug("mealController: updateMeal called.");
     //format allergenes JSON to the right string for the query
     const allergenes = req.body.allergenes;
     let allergenesString = "";
@@ -230,7 +239,8 @@ let controller = {
 
     let mealReq = req.body;
     mealReq.allergenes = allergenesString;
-
+    logger.debug("mealController: updateMeal --> altered mealReq.");
+    logger.debug(mealReq);
     dbconnection.getConnection(function (err, connection) {
       //not connected
       if (err) {

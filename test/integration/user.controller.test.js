@@ -4,8 +4,9 @@ const server = require("../../index");
 const dbconnection = require("../../database/dbconnection");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const { jwtSecretKey, logger } = require("../../src/config/config");
+const { jwtSecretKey } = require("../../src/config/config");
 const { expect } = require("chai");
+const logger = require("../../src/config/config").logger;
 
 const INSERT_USER =
   "INSERT INTO `user` (`id`, `firstName`, `lastName`, `street`, `city`, `isActive`, `password`, `emailAdress`,  `phoneNumber` ) VALUES" +
@@ -24,7 +25,7 @@ chai.use(chaiHttp);
 describe("Users", () => {
   describe("Testcases of UC-201, create a new user, api/user/ ", () => {
     beforeEach((done) => {
-      console.log("beforeEach called");
+      logger.debug("userTests: beforeEach called.");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
         connection.query(
@@ -182,7 +183,7 @@ describe("Users", () => {
 
   describe("UC-202 Overzicht van gebruikers", () => {
     beforeEach((done) => {
-      console.log("beforeEach called");
+      logger.debug("userTests: beforeEach called.");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
         connection.query(
@@ -302,7 +303,7 @@ describe("Users", () => {
 
   describe("UC-203 get Profile", () => {
     beforeEach((done) => {
-      console.log("beforeEach called");
+      logger.debug("userTests: beforeEach called.");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
         connection.query(
@@ -363,7 +364,7 @@ describe("Users", () => {
 
   describe("UC-204 Details van gebruiker", () => {
     beforeEach((done) => {
-      console.log("beforeEach called");
+      logger.debug("userTests: beforeEach called.");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
         connection.query(
@@ -444,7 +445,7 @@ describe("Users", () => {
 
   describe("UC-205 Gebruiker wijzigen", () => {
     beforeEach((done) => {
-      console.log("beforeEach called");
+      logger.debug("userTests: beforeEach called.");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
         connection.query(
@@ -602,7 +603,7 @@ describe("Users", () => {
 
   describe("UC-206 Gebruiker verwijderen", () => {
     beforeEach((done) => {
-      console.log("beforeEach called");
+      logger.debug("userTests: beforeEach called.");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
         connection.query(

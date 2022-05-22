@@ -1,20 +1,21 @@
 const assert = require("assert");
 const jwt = require("jsonwebtoken");
 const dbconnection = require("../../database/dbconnection");
-const logger = require("../config/config").logger;
+const logger = require("../../src/config/config").logger;
 const jwtSecretKey = require("../config/config").jwtSecretKey;
 
 module.exports = {
   validateEmail: (req, res, next) => {
-    //email regex
+    logger.debug("authController: validateEmail called");
     const emailRegex = new RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
     let user = req.body;
     let emailAdress = user.emailAdress;
     try {
       assert(emailRegex.test(emailAdress) === true, "Emailaddress isn't valid");
+      logger.debug("authController: Email is Valid.");
       next();
     } catch (err) {
-      console.log(err);
+      logger.debug("authController: Email is not valid.");
       error = {
         status: 400,
         message: err.message,
@@ -25,17 +26,18 @@ module.exports = {
 
   validatePassword: (req, res, next) => {
     // password must contain 1 upper and lowercase char, 1 number, and atleast 8 chars.
+    logger.debug("authController: validatePassword called.");
     const passwordRegex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/);
-    console.log("validatePassword: Called");
     try {
       assert(
         passwordRegex.test(req.body.password) === true,
         "Password isn't valid (must contain 1 uppercase letter, 1 number, and be atleast 8 characters long."
       );
+      logger.debug("authController: password is valid.");
 
       next();
     } catch (err) {
-      console.log("ValidatePassword: " + err);
+      logger.debug("authController: password is not valid.");
       error = {
         status: 400,
         message: err.message,
@@ -45,6 +47,7 @@ module.exports = {
   },
 
   login(req, res, next) {
+    logger.debug("authController: login called.");
     dbconnection.getConnection((err, connection) => {
       if (err) {
         logger.error("Error getting connection from dbconnection");
@@ -112,6 +115,7 @@ module.exports = {
   },
 
   validateLogin(req, res, next) {
+    logger.debug("authController: validate login called.");
     // Verify that we receive the expected input
     try {
       assert(
@@ -129,14 +133,9 @@ module.exports = {
   },
 
   validateToken(req, res, next) {
-    logger.info("validateToken called");
+    logger.debug("authController: validateToken called.");
     // logger.trace(req.headers)
     // The headers should contain the authorization-field with value 'Bearer [token]'
-    if (req) {
-      console.log("req is aanwezig");
-    } else {
-      console.log("req is leeg");
-    }
     const authHeader = req.headers.authorization;
     if (!authHeader) {
       logger.warn("Authorization header missing!");

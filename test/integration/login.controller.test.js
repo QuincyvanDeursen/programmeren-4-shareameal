@@ -3,6 +3,7 @@ const chaiHttp = require("chai-http");
 const server = require("../../index");
 const dbconnection = require("../../database/dbconnection");
 require("dotenv").config();
+const logger = require("../../src/config/config").logger;
 
 const INSERT_USER =
   "INSERT INTO `user` (`id`, `firstName`, `lastName`, `street`, `city`, `isActive`, `password`, `emailAdress`,  `phoneNumber` ) VALUES" +
@@ -21,7 +22,7 @@ chai.use(chaiHttp);
 describe("Login", () => {
   describe("Testcases of UC-101, login /api/auth/login/ ", () => {
     beforeEach((done) => {
-      console.log("beforeEach called");
+      logger.debug("loginTests: beforeEach called.");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
         connection.query(

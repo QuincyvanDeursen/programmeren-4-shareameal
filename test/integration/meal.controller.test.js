@@ -4,7 +4,8 @@ const server = require("../../index");
 const dbconnection = require("../../database/dbconnection");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const { jwtSecretKey, logger } = require("../../src/config/config");
+const { jwtSecretKey } = require("../../src/config/config");
+const logger = require("../../src/config/config").logger;
 
 const INSERT_USER =
   "INSERT INTO `user` (`id`, `firstName`, `lastName`, `street`, `city`, `isActive`, `password`, `emailAdress`,  `phoneNumber` ) VALUES" +
@@ -29,7 +30,7 @@ chai.use(chaiHttp);
 describe("meals", () => {
   describe("Testcases of UC-301, create a new meal, api/meal/ ", () => {
     beforeEach((done) => {
-      console.log("beforeEach called");
+      logger.debug("mealTests: beforeEach called.");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
         connection.query(
@@ -153,7 +154,7 @@ describe("meals", () => {
 
   describe("Testcases of UC-302, updating a  meal, api/meal/:mealId ", () => {
     beforeEach((done) => {
-      console.log("beforeEach called");
+      logger.debug("mealTests: beforeEach called.");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
         connection.query(
@@ -304,7 +305,6 @@ describe("meals", () => {
         })
         .end((err, res) => {
           res.should.be.an("object");
-          console.log(res.body);
           let { status, result } = res.body;
           status.should.equals(200);
           result.should.be.a("object").that.contains({
@@ -329,7 +329,7 @@ describe("meals", () => {
 
   describe("Testcases of UC-303, getting all meals, api/meal/ ", () => {
     beforeEach((done) => {
-      console.log("beforeEach called");
+      logger.debug("mealTests: beforeEach called.");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
         connection.query(
@@ -362,7 +362,7 @@ describe("meals", () => {
 
   describe("Testcases of UC-304, get details of a meal, api/meal/mealId ", () => {
     beforeEach((done) => {
-      console.log("beforeEach called");
+      logger.debug("mealTests: beforeEach called.");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
         connection.query(
@@ -424,7 +424,7 @@ describe("meals", () => {
   });
   describe("Testcases of UC-305, deleting a meal, api/meal/mealId ", () => {
     beforeEach((done) => {
-      console.log("beforeEach called");
+      logger.debug("mealTests: beforeEach called.");
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err; // not connected!
         connection.query(
